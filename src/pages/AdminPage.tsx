@@ -203,59 +203,85 @@ export function AdminPage() {
             )}
 
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#2d5a27]/20 pb-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-[#1a3c18] flex items-center gap-3">
-                        <Sprout className="h-8 w-8 text-[#2d5a27]" />
-                        Farm Administration
-                    </h1>
-                    <p className="text-muted-foreground mt-1">Manage your farm inventory, track stock, and organize produce.</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-[#2d5a27]/10 pb-10">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 rounded-2xl bg-[#2d5a27] flex items-center justify-center text-[#eec90d] shadow-xl">
+                            <Sprout className="h-7 w-7" />
+                        </div>
+                        <h1 className="text-4xl font-black text-[#1a3c18] tracking-tighter uppercase">
+                            Farm Control
+                        </h1>
+                    </div>
+                    <p className="text-muted-foreground font-bold text-sm tracking-wide ml-1">Precision agriculture & inventory sovereignty.</p>
                 </div>
+                <Button
+                    onClick={resetForm}
+                    className="h-14 px-8 bg-[#1a3c18] hover:bg-[#2d5a27] text-white font-black uppercase tracking-widest rounded-2xl shadow-xl transition-all hover:scale-105"
+                >
+                    <Plus className="mr-2 h-5 w-5" />
+                    Initialize Batch
+                </Button>
             </div>
 
-            {/* Stats Cards - Farm Themed */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="border-l-4 border-l-[#2d5a27] bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+            {/* Premium Stats Dashboard */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="glass overflow-hidden border-0 shadow-xl group transition-all duration-500 hover:-translate-y-2">
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-[#2d5a27]" />
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Total Produce</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.total}</p>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-[#2d5a27] uppercase tracking-widest opacity-60">Total Yield</p>
+                                <p className="text-4xl font-black text-[#1a3c18] tracking-tighter">{stats.total}</p>
                             </div>
-                            <Package className="h-8 w-8 text-[#2d5a27] opacity-80" />
+                            <div className="h-14 w-14 rounded-2xl bg-[#2d5a27]/5 flex items-center justify-center text-[#2d5a27] group-hover:bg-[#2d5a27] group-hover:text-white transition-colors duration-500">
+                                <Package className="h-7 w-7" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-yellow-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+
+                <Card className="glass overflow-hidden border-0 shadow-xl group transition-all duration-500 hover:-translate-y-2">
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-[#eec90d]" />
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Farm Value</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">${stats.totalValue.toFixed(2)}</p>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-[#eec90d] uppercase tracking-widest opacity-80">Market Value</p>
+                                <p className="text-4xl font-black text-[#1a3c18] tracking-tighter">${stats.totalValue.toLocaleString()}</p>
                             </div>
-                            <DollarSign className="h-8 w-8 text-yellow-600 opacity-80" />
+                            <div className="h-14 w-14 rounded-2xl bg-[#eec90d]/10 flex items-center justify-center text-[#eec90d] group-hover:bg-[#eec90d] group-hover:text-[#1a3c18] transition-colors duration-500">
+                                <DollarSign className="h-7 w-7" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-orange-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+
+                <Card className="glass overflow-hidden border-0 shadow-xl group transition-all duration-500 hover:-translate-y-2">
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-orange-500" />
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Low Stock</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.lowStock}</p>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest opacity-60">Low Supply</p>
+                                <p className="text-4xl font-black text-[#1a3c18] tracking-tighter">{stats.lowStock}</p>
                             </div>
-                            <AlertCircle className="h-8 w-8 text-orange-500 opacity-80" />
+                            <div className="h-14 w-14 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-500">
+                                <AlertCircle className="h-7 w-7" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-red-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+
+                <Card className="glass overflow-hidden border-0 shadow-xl group transition-all duration-500 hover:-translate-y-2">
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-red-600" />
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Out of Stock</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.outOfStock}</p>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-red-600 uppercase tracking-widest opacity-60">Exhausted</p>
+                                <p className="text-4xl font-black text-[#1a3c18] tracking-tighter">{stats.outOfStock}</p>
                             </div>
-                            <Layers className="h-8 w-8 text-red-500 opacity-80" />
+                            <div className="h-14 w-14 rounded-2xl bg-red-600/10 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors duration-500">
+                                <Layers className="h-7 w-7" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
