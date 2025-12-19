@@ -27,7 +27,7 @@ export function AdminPage() {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [preview, setPreview] = useState<string | null>(null);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<string | number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [stats, setStats] = useState<ProductStats>({
@@ -140,7 +140,7 @@ export function AdminPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string | number) => {
         if (!confirm('Are you sure you want to delete this product?')) return;
 
         try {

@@ -6,7 +6,7 @@ const API_URL = isLocal
   : "https://green-africa-farm-backend.vercel.app/api/products";
 
 export interface Product {
-  id?: number;
+  id?: string | number;
   name: string;
   description_am?: string;
   description_om?: string;
@@ -43,7 +43,7 @@ export const api = {
     return response.data;
   },
 
-  getProductById: async (id: number) => {
+  getProductById: async (id: string | number) => {
     const response = await axios.get(`${API_URL}/${id}`);
     return response.data;
   },
@@ -63,12 +63,15 @@ export const api = {
     return response.data;
   },
 
-  updateProduct: async (id: number, product: Partial<ProductInput>) => {
+  updateProduct: async (
+    id: string | number,
+    product: Partial<ProductInput>
+  ) => {
     const response = await axios.put(`${API_URL}/${id}`, product);
     return response.data;
   },
 
-  deleteProduct: async (id: number) => {
+  deleteProduct: async (id: string | number) => {
     const response = await axios.delete(`${API_URL}/${id}`);
     return response.data;
   },
