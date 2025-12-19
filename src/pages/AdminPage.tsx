@@ -87,9 +87,10 @@ export function AdminPage() {
             if (response.success) {
                 setProducts(response.data);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch products', error);
-            setNotification({ type: 'error', message: 'Failed to fetch products' });
+            const message = error.response?.data?.error || 'Failed to fetch products';
+            setNotification({ type: 'error', message });
         } finally {
             setFetching(false);
         }
@@ -147,9 +148,10 @@ export function AdminPage() {
             await fetchProducts();
             await fetchStats(); // Refresh stats
             setNotification({ type: 'success', message: 'Product deleted successfully!' });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to delete product', error);
-            setNotification({ type: 'error', message: 'Failed to delete product' });
+            const message = error.response?.data?.error || 'Failed to delete product';
+            setNotification({ type: 'error', message });
         }
     };
 
@@ -174,9 +176,10 @@ export function AdminPage() {
             await fetchProducts();
             await fetchStats(); // Refresh stats
             resetForm();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save product', error);
-            setNotification({ type: 'error', message: 'Failed to save product' });
+            const message = error.response?.data?.error || 'Failed to save product';
+            setNotification({ type: 'error', message });
         } finally {
             setLoading(false);
         }

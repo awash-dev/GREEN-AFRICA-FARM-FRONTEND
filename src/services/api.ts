@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API_URL = "https://green-africa-farm-backend.vercel.app/api/products";
+const isLocal = window.location.hostname === "localhost";
+const API_URL = isLocal
+  ? "http://localhost:3000/api/products"
+  : "https://green-africa-farm-backend.vercel.app/api/products";
 
 export interface Product {
   id?: number;
