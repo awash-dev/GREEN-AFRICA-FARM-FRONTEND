@@ -2,42 +2,34 @@ import axios from "axios";
 
 const isLocal = window.location.hostname === "localhost";
 const API_URL = isLocal
-  ? "http://localhost:3000/api/products"
+  ? "https://green-africa-farm-backend.vercel.app/api/products"
   : "https://green-africa-farm-backend.vercel.app/api/products";
 
 export interface Product {
   id?: string | number;
   name: string;
+  category: string;
+  description: string;
   description_am?: string;
   description_om?: string;
-  description: string;
   price: number;
-  stock: number;
-  category: string;
   image_base64?: string;
-  unit?: string;
-  origin?: string;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface ProductInput {
   name: string;
-  description: string;
-  description_am?: string;
-  description_om?: string;
-  price: number;
-  stock: number;
   category: string;
+  description: string;
+  description_am: string;
+  description_om: string;
+  price: number;
   image_base64: string;
-  unit?: string;
-  origin?: string;
 }
 
 export interface ProductStats {
   total: number;
-  lowStock: number;
-  outOfStock: number;
   totalValue: number;
 }
 

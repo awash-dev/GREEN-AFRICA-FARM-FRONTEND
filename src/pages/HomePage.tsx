@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 import { api, Product } from '@/services/api';
 import { ProductCard } from '@/components/ProductCard';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, Filter, Globe } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export function HomePage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -18,11 +24,10 @@ export function HomePage() {
         fetchProducts();
     }, []);
 
-    // Debounce search effect or use button to trigger
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchProducts();
-        }, 500); // Debounce search by 500ms
+        }, 500);
         return () => clearTimeout(timer);
     }, [search, category]);
 
@@ -34,7 +39,6 @@ export function HomePage() {
             }
         } catch (error) {
             console.error('Failed to fetch categories', error);
-            // Fallback default categories
             setCategories(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
         }
     };
@@ -58,71 +62,73 @@ export function HomePage() {
     };
 
     return (
-        <div className="space-y-8">
-            {/* Hero Section */}
-            <section className="bg-primary/10 rounded-xl p-8 md:p-12 text-center space-y-4 border border-primary/20">
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-                    Fresh from Green Africa Farm
-                </h1>
-                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                    Organic, sustainable, and locally sourced agricultural products delivered straight to your table.
-                </p>
-            </section>
-
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-20 z-40 bg-background/80 backdrop-blur pb-4 pt-2">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search produce..."
-                        className="pl-9"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
-
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    {/* Language Switcher */}
-                    <div className="flex items-center gap-2 bg-white/50 p-1 rounded-lg border border-input">
-                        <select
-                            className="h-8 rounded-md border-0 bg-transparent px-3 py-1 text-sm font-medium focus:ring-0 cursor-pointer text-[#1a3c18]"
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value as any)}
-                        >
-                            <option value="en">English</option>
-                            <option value="am">Amharic (አማርኛ)</option>
-                            <option value="om">Afan Oromo</option>
-                        </select>
+        <div className="space-y-12">
+            {/* Unified Search Section */}
+            <div className="sticky top-[5rem] z-40">
+                <div className="flex flex-col md:flex-row items-center gap-2 p-1.5 bg-white/80 backdrop-blur-md border border-emerald-500/10 rounded-2xl shadow-sm">
+                    <div className="relative flex-1 w-full">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600/40" />
+                        <Input
+                            placeholder="Search fresh produce..."
+                            className="h-12 pl-10 border-none bg-transparent focus-visible:ring-0 text-base"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
 
-                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                        {categories.map((cat) => (
-                            <Button
-                                key={cat}
-                                variant={category === (cat === 'All' ? '' : cat) ? 'default' : 'outline'}
-                                onClick={() => setCategory(cat === 'All' ? '' : cat)}
-                                className={`rounded-full capitalize whitespace-nowrap ${category === (cat === 'All' ? '' : cat) ? 'bg-[#2d5a27] hover:bg-[#1a3c18]' : 'text-[#2d5a27] border-[#2d5a27]/30'}`}
-                            >
-                                {cat}
-                            </Button>
-                        ))}
+                    <div className="hidden md:block w-px h-8 bg-emerald-500/10" />
+
+                    <div className="flex items-center gap-2 w-full md:w-auto px-2">
+                        <div className="flex items-center gap-2 bg-emerald-50/30 rounded-xl px-2">
+                            <Filter className="h-4 w-4 text-emerald-600/50" />
+                            <Select value={category || 'All'} onValueChange={(val) => setCategory(val === 'All' ? '' : val)}>
+                                <SelectTrigger className="w-[140px] h-10 border-none bg-transparent focus:ring-0 capitalize font-medium text-emerald-900">
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-emerald-500/10">
+                                    {categories.map((cat) => (
+                                        <SelectItem key={cat} value={cat} className="capitalize">
+                                            {cat}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex items-center gap-2 bg-secondary/20 rounded-xl px-2">
+                            <Globe className="h-4 w-4 text-emerald-600/50" />
+                            <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
+                                <SelectTrigger className="w-[120px] h-10 border-none bg-transparent focus:ring-0 font-medium text-emerald-900">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-emerald-500/10">
+                                    <SelectItem value="en">English</SelectItem>
+                                    <SelectItem value="am">አማርኛ</SelectItem>
+                                    <SelectItem value="om">Oromo</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Product Grid */}
             {loading ? (
-                <div className="min-h-[400px] flex items-center justify-center flex-col gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Loading fresh produce...</p>
+                <div className="min-h-[400px] flex items-center justify-center flex-col gap-4 text-emerald-600">
+                    <div className="relative">
+                        <Loader2 className="h-10 w-10 animate-spin" />
+                        <div className="absolute inset-0 blur-xl bg-emerald-500/10 animate-pulse" />
+                    </div>
+                    <p className="font-bold text-xs uppercase tracking-widest opacity-50">Fetching harvest...</p>
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 text-muted-foreground">
-                    No products found. Try adjusting your filters.
+                <div className="text-center py-24 border-2 border-dashed border-emerald-500/5 rounded-[2rem]">
+                    <Search className="h-12 w-12 text-emerald-100 mx-auto mb-4" />
+                    <p className="text-emerald-900/40 font-medium">No results found for your search.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pt-4">
-                    {products.map((product) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {products.map((product: Product) => (
                         <ProductCard key={product.id} product={product} language={language} />
                     ))}
                 </div>

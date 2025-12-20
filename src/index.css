@@ -103,6 +103,17 @@
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-color: hsl(var(--border) / 0.1);
+  }
+}
+
+@layer base {
   * {
     @apply border-border;
   }
