@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@theme {
+  --color-root-background: var(--background);
+  --color-root-foreground: var(--foreground);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  :root {
+    /* Farm Theme Colors - Earthy Greens and Natural Tones */
+    --background: 120 20% 98%; /* Very light green tint */
+    --foreground: 120 10% 10%; /* Dark green-black */
+
+    --card: 0 0% 100%;
+    --card-foreground: 120 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 10% 10%;
+
+    --primary: 142 76% 36%; /* Vibrant Farm Green */
+    --primary-foreground: 355 100% 98%;
+
+    --secondary: 48 96% 89%; /* Creamy Wheat */
+    --secondary-foreground: 24 9.8% 10%;
+
+    --muted: 120 10% 96%;
+    --muted-foreground: 120 5% 45%;
+
+    --accent: 120 20% 90%;
+    --accent-foreground: 24 9.8% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 120 10% 90%;
+    --input: 120 10% 90%;
+    --ring: 142 76% 36%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 120 10% 10%;
+    --foreground: 120 10% 95%;
+
+    --card: 120 10% 13%;
+    --card-foreground: 120 10% 95%;
+
+    --popover: 120 10% 13%;
+    --popover-foreground: 120 10% 95%;
+
+    --primary: 142 70% 45%;
+    --primary-foreground: 120 10% 10%;
+
+    --secondary: 120 10% 20%;
+    --secondary-foreground: 120 10% 95%;
+
+    --muted: 120 10% 20%;
+    --muted-foreground: 120 10% 65%;
+
+    --accent: 120 10% 20%;
+    --accent-foreground: 120 10% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 120 10% 95%;
+
+    --border: 120 10% 20%;
+    --input: 120 10% 20%;
+    --ring: 142 70% 45%;
+  }
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-color: hsl(var(--border) / 0.1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Outfit", "Inter", sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/40 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-md border border-white/10 shadow-xl;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(45, 90, 39, 0.3);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/40 rounded-full hover:bg-primary/60 transition-colors;
+}
