@@ -209,53 +209,35 @@ export function AdminPage() {
                         <Sprout className="h-8 w-8 text-[#2d5a27]" />
                         Farm Administration
                     </h1>
-                    <p className="text-muted-foreground mt-1">Manage your farm inventory, track stock, and organize produce.</p>
+                    <p className="text-muted-foreground mt-1">Manage your farm inventory and organize produce.</p>
                 </div>
             </div>
 
             {/* Stats Cards - Farm Themed */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="border-l-4 border-l-[#2d5a27] bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-muted-foreground">Total Produce</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.total}</p>
+                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Produce</p>
+                                <p className="text-3xl font-bold text-[#1a3c18] mt-1">{stats.total}</p>
                             </div>
-                            <Package className="h-8 w-8 text-[#2d5a27] opacity-80" />
+                            <div className="p-3 bg-[#2d5a27]/10 rounded-xl">
+                                <Package className="h-8 w-8 text-[#2d5a27]" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
                 <Card className="border-l-4 border-l-yellow-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
+                    <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-muted-foreground">Farm Value</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">${stats.totalValue.toFixed(2)}</p>
+                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Farm Value</p>
+                                <p className="text-3xl font-bold text-[#1a3c18] mt-1">{stats.totalValue.toFixed(2)} ETB</p>
                             </div>
-                            <DollarSign className="h-8 w-8 text-yellow-600 opacity-80" />
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-orange-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Low Stock</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.lowStock}</p>
+                            <div className="p-3 bg-yellow-500/10 rounded-xl">
+                                <DollarSign className="h-8 w-8 text-yellow-600" />
                             </div>
-                            <AlertCircle className="h-8 w-8 text-orange-500 opacity-80" />
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-red-500 bg-[#fdfefc] hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Out of Stock</p>
-                                <p className="text-2xl font-bold text-[#1a3c18]">{stats.outOfStock}</p>
-                            </div>
-                            <Layers className="h-8 w-8 text-red-500 opacity-80" />
                         </div>
                     </CardContent>
                 </Card>
@@ -354,42 +336,24 @@ export function AdminPage() {
                                     />
                                 </div>
 
-                                {/* Price & Stock */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="price" className="flex items-center gap-2 text-[#1a3c18] font-medium">
-                                            <DollarSign className="h-4 w-4" />
-                                            Price
-                                        </Label>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                            <Input
-                                                id="price"
-                                                type="number"
-                                                min="0"
-                                                step="0.01"
-                                                value={formData.price}
-                                                onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
-                                                required
-                                                className="h-11 pl-7 border-input focus-visible:ring-[#2d5a27]"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="stock" className="flex items-center gap-2 text-[#1a3c18] font-medium">
-                                            <Package className="h-4 w-4" />
-                                            Stock
-                                        </Label>
+                                {/* Price */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="price" className="flex items-center gap-2 text-[#1a3c18] font-medium">
+                                        <DollarSign className="h-4 w-4" />
+                                        Price (ETB)
+                                    </Label>
+                                    <div className="relative">
                                         <Input
-                                            id="stock"
+                                            id="price"
                                             type="number"
                                             min="0"
-                                            step="1"
-                                            value={formData.stock}
-                                            onChange={e => setFormData(prev => ({ ...prev, stock: parseInt(e.target.value) }))}
+                                            step="0.01"
+                                            value={formData.price}
+                                            onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
                                             required
                                             className="h-11 border-input focus-visible:ring-[#2d5a27]"
                                         />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">ETB</span>
                                     </div>
                                 </div>
 
@@ -486,7 +450,7 @@ export function AdminPage() {
                                         <Package className="h-5 w-5" />
                                         Farm Inventory
                                     </CardTitle>
-                                    <CardDescription>{stats.total} items in stock</CardDescription>
+                                    <CardDescription>{stats.total} total items</CardDescription>
                                 </div>
                                 {/* Search */}
                                 <div className="relative w-full sm:w-64">
@@ -519,9 +483,6 @@ export function AdminPage() {
                             ) : (
                                 <div className="divide-y">
                                     {products.map((product) => {
-                                        const isLowStock = product.stock <= 5 && product.stock > 0;
-                                        const isOutOfStock = product.stock === 0;
-
                                         return (
                                             <div
                                                 key={product.id}
@@ -549,25 +510,11 @@ export function AdminPage() {
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 flex-wrap">
                                                             <h4 className="font-semibold truncate text-[#1a3c18] mr-auto">{product.name}</h4>
-                                                            {isOutOfStock && (
-                                                                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700 whitespace-nowrap">
-                                                                    Out of Stock
-                                                                </span>
-                                                            )}
-                                                            {isLowStock && (
-                                                                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700 whitespace-nowrap">
-                                                                    Low Stock
-                                                                </span>
-                                                            )}
                                                         </div>
                                                         <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground flex-wrap">
                                                             <span className="inline-flex items-center gap-1">
                                                                 <Layers className="h-3 w-3" />
                                                                 {product.category || 'Uncategorized'}
-                                                            </span>
-                                                            <span className="inline-flex items-center gap-1">
-                                                                <Package className="h-3 w-3" />
-                                                                {product.stock} units
                                                             </span>
                                                         </div>
                                                     </div>
@@ -578,7 +525,7 @@ export function AdminPage() {
                                                     {/* Price */}
                                                     <div className="text-left sm:text-right">
                                                         <span className="text-lg font-bold text-[#1a3c18]">
-                                                            ${product.price.toFixed(2)}
+                                                            {product.price.toFixed(2)} ETB
                                                         </span>
                                                         <p className="text-xs text-muted-foreground">per unit</p>
                                                     </div>
