@@ -18,16 +18,23 @@ export function HomePage() {
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState<string[]>([]);
     const [language, setLanguage] = useState<'en' | 'am' | 'om'>('en');
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
         fetchCategories();
-        fetchProducts();
     }, []);
 
     useEffect(() => {
+        // Initial load should be fast, subsequent searches debounced
+        if (isFirstLoad) {
+            fetchProducts(true);
+            setIsFirstLoad(false);
+            return;
+        }
+
         const timer = setTimeout(() => {
-            fetchProducts();
-        }, 500);
+            fetchProducts(false);
+        }, 400);
         return () => clearTimeout(timer);
     }, [search, category]);
 
@@ -43,8 +50,8 @@ export function HomePage() {
         }
     };
 
-    const fetchProducts = async () => {
-        setLoading(true);
+    const fetchProducts = async (showFullLoading: boolean) => {
+        if (showFullLoading) setLoading(true);
         try {
             const params: any = {};
             if (search) params.search = search;
@@ -65,7 +72,7 @@ export function HomePage() {
         <div className="space-y-12">
             {/* Unified Search Section */}
             <div className="sticky top-[5rem] z-40">
-                <div className="flex flex-col md:flex-row items-center gap-2 p-1.5 bg-white/80 backdrop-blur-md border border-emerald-500/10 rounded-2xl shadow-sm">
+                <div className="flex flex-col md:flex-row items-center gap-2 p-1.5 bg-white border border-emerald-500/10 rounded-2xl shadow-sm">
                     <div className="relative flex-1 w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600/40" />
                         <Input
@@ -85,7 +92,7 @@ export function HomePage() {
                                 <SelectTrigger className="w-[140px] h-10 border-none bg-transparent focus:ring-0 capitalize font-medium text-emerald-900">
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl border-emerald-500/10">
+                                <SelectContent className="rounded-xl border-emerald-500/10 bg-white">
                                     {categories.map((cat) => (
                                         <SelectItem key={cat} value={cat} className="capitalize">
                                             {cat}
@@ -101,7 +108,7 @@ export function HomePage() {
                                 <SelectTrigger className="w-[120px] h-10 border-none bg-transparent focus:ring-0 font-medium text-emerald-900">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl border-emerald-500/10">
+                                <SelectContent className="rounded-xl border-emerald-500/10 bg-white">
                                     <SelectItem value="en">English</SelectItem>
                                     <SelectItem value="am">አማርኛ</SelectItem>
                                     <SelectItem value="om">Oromo</SelectItem>
