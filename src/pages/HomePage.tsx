@@ -18,23 +18,14 @@ export function HomePage() {
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState<string[]>([]);
     const [language, setLanguage] = useState<'en' | 'am' | 'om'>('en');
-    const [isFirstLoad, setIsFirstLoad] = useState(true);
-
     useEffect(() => {
         fetchCategories();
     }, []);
 
     useEffect(() => {
-        // Initial load should be fast, subsequent searches debounced
-        if (isFirstLoad) {
-            fetchProducts(true);
-            setIsFirstLoad(false);
-            return;
-        }
-
         const timer = setTimeout(() => {
-            fetchProducts(false);
-        }, 400);
+            fetchProducts(products.length === 0); // Only show full loader on first fetch
+        }, search || category ? 400 : 0); // No delay on initial load
         return () => clearTimeout(timer);
     }, [search, category]);
 
@@ -53,9 +44,9 @@ export function HomePage() {
     const fetchProducts = async (showFullLoading: boolean) => {
         if (showFullLoading) setLoading(true);
         try {
-            const params: any = {};
+            const params: any = { limit: 100 };
             if (search) params.search = search;
-            if (category && category !== 'All') params.category = category;
+            if (category && category !== 'All') params.category = category.trim();
 
             const response = await api.getAllProducts(params);
             if (response.success) {
