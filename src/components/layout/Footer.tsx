@@ -69,10 +69,10 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-center items-center gap-2 text-xs text-gray-400">
                     <p>© 2025 Green Africa Farm. All rights reserved.</p>
-                    <div className="flex items-center gap-1">
-                        <span>Developed by</span>
+                    <div className="flex items-center">
+                        <span>Developed by </span>
                         <a
                             href="https://github.com/awash-dev"
                             target="_blank"

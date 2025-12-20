@@ -43,7 +43,9 @@ export function AdminPage() {
         price: 0,
         stock: 0,
         category: '',
-        image_base64: ''
+        image_base64: '',
+        unit: 'Kg',
+        origin: ''
     });
 
     useEffect(() => {
@@ -118,7 +120,9 @@ export function AdminPage() {
             price: 0,
             stock: 0,
             category: '',
-            image_base64: ''
+            image_base64: '',
+            unit: 'Kg',
+            origin: ''
         });
         setPreview(null);
         setEditingId(null);
@@ -134,7 +138,9 @@ export function AdminPage() {
             price: product.price,
             stock: product.stock,
             category: product.category || '',
-            image_base64: product.image_base64 || ''
+            image_base64: product.image_base64 || '',
+            unit: product.unit || 'Kg',
+            origin: product.origin || ''
         });
         setPreview(product.image_base64 || null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -320,40 +326,71 @@ export function AdminPage() {
                                     />
                                 </div>
 
-                                {/* Category Input */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="category" className="flex items-center gap-2 text-[#1a3c18] font-medium">
-                                        <Layers className="h-4 w-4" />
-                                        Category
-                                    </Label>
-                                    <Input
-                                        id="category"
-                                        placeholder="e.g. Vegetables"
-                                        value={formData.category}
-                                        onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                                        required
-                                        className="h-11 border-input focus-visible:ring-[#2d5a27]"
-                                    />
-                                </div>
-
-                                {/* Price */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="price" className="flex items-center gap-2 text-[#1a3c18] font-medium">
-                                        <DollarSign className="h-4 w-4" />
-                                        Price (ETB)
-                                    </Label>
-                                    <div className="relative">
+                                {/* Category & Unit */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="category" className="flex items-center gap-2 text-[#1a3c18] font-medium">
+                                            <Layers className="h-4 w-4" />
+                                            Category
+                                        </Label>
                                         <Input
-                                            id="price"
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={formData.price}
-                                            onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                                            id="category"
+                                            placeholder="e.g. Vegetables"
+                                            value={formData.category}
+                                            onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
                                             required
                                             className="h-11 border-input focus-visible:ring-[#2d5a27]"
                                         />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">ETB</span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="unit" className="flex items-center gap-2 text-[#1a3c18] font-medium">
+                                            <Package className="h-4 w-4" />
+                                            Unit (e.g. Kg)
+                                        </Label>
+                                        <Input
+                                            id="unit"
+                                            placeholder="e.g. Kg"
+                                            value={formData.unit}
+                                            onChange={e => setFormData(prev => ({ ...prev, unit: e.target.value }))}
+                                            required
+                                            className="h-11 border-input focus-visible:ring-[#2d5a27]"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Price & Origin */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="price" className="flex items-center gap-2 text-[#1a3c18] font-medium">
+                                            <DollarSign className="h-4 w-4" />
+                                            Price (ETB)
+                                        </Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="price"
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                value={formData.price}
+                                                onChange={e => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                                                required
+                                                className="h-11 border-input focus-visible:ring-[#2d5a27]"
+                                            />
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-xs">ETB</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="origin" className="flex items-center gap-2 text-[#1a3c18] font-medium">
+                                            <Sprout className="h-4 w-4" />
+                                            Origin / Farm
+                                        </Label>
+                                        <Input
+                                            id="origin"
+                                            placeholder="e.g. Arsi Zone"
+                                            value={formData.origin}
+                                            onChange={e => setFormData(prev => ({ ...prev, origin: e.target.value }))}
+                                            className="h-11 border-input focus-visible:ring-[#2d5a27]"
+                                        />
                                     </div>
                                 </div>
 
@@ -437,8 +474,6 @@ export function AdminPage() {
                         </CardContent>
                     </Card>
                 </div>
-
-
 
                 {/* List Section */}
                 <div className="lg:col-span-2">

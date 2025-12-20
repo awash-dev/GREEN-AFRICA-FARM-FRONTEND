@@ -15,6 +15,8 @@ export interface Product {
   stock: number;
   category: string;
   image_base64?: string;
+  unit?: string;
+  origin?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -28,6 +30,8 @@ export interface ProductInput {
   stock: number;
   category: string;
   image_base64: string;
+  unit?: string;
+  origin?: string;
 }
 
 export interface ProductStats {

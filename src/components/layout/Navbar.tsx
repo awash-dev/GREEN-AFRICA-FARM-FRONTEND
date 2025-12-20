@@ -1,14 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Leaf } from 'lucide-react';
 
 export function Navbar() {
     const location = useLocation();
 
-    const navLinks = [
-        { to: '/', label: 'Marketplace' },
-        { to: '/admin', label: 'Farm Admin' },
-    ];
+    const navLinks: { to: string; label: string }[] = [];
 
     return (
         <nav className="glass sticky top-0 z-[999] border-b border-white/20 shadow-xl overflow-hidden">
@@ -47,9 +43,7 @@ export function Navbar() {
                             )}
                         </Link>
                     ))}
-                    <Button className="hidden sm:flex rounded-full bg-[#1a3c18] hover:bg-[#2d5a27] text-white px-4 md:px-8 h-10 md:h-12 uppercase font-black tracking-widest text-[9px] md:text-[10px] shadow-lg hover:shadow-[#2d5a27]/20 transition-all">
-                        Support Us
-                    </Button>
+
                 </div>
             </div>
         </nav>
