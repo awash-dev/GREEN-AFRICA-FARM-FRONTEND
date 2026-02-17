@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User } from 'lucide-react';
+import { User, Loader2 } from 'lucide-react';
 import { api, TeamMember } from '../services/api';
 
 export default function About() {
     const [team, setTeam] = useState<TeamMember[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTeam = async () => {
@@ -15,30 +16,39 @@ export default function About() {
                 }
             } catch (err) {
                 console.error("Error fetching team:", err);
+            } finally {
+                setLoading(false);
             }
         };
         fetchTeam();
     }, []);
 
     return (
-        <div className="flex flex-col bg-white overflow-x-hidden min-h-screen pt-3">
+        <div className="flex flex-col bg-white overflow-x-hidden min-h-screen pt-4 md:pt-8">
 
             {/* 1. Main Content - Split Layout */}
-            <section className="container mx-auto px-4 flex items-center py-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <section className="container mx-auto px-4 py-8 md:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
                     {/* LEFT COLUMN: Leader Image & Info */}
                     <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
                         className="relative"
                     >
-                        {team.length > 0 ? (
+                        {loading ? (
+                        <div className="flex items-center justify-center h-full min-h-[300px] border-2 border-dashed border-stone-200 rounded-[2.5rem] bg-stone-50">
+                            <div className="text-center space-y-4">
+                                <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mx-auto" />
+                                <p className="text-stone-500 font-medium">Loading team...</p>
+                            </div>
+                        </div>
+                    ) : team.length > 0 ? (
                             <div className="relative group">
-                                <div className="absolute inset-0 rotate-6 scale-[1.02] opacity-50 blur-xl transition-all duration-500 group-hover:rotate-3 group-hover:opacity-70" />
-                                <div className="relative w-[400px] h-[400px] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white mx-auto lg:mx-0">
+                                <div className="absolute inset-0 bg-emerald-500/10 rotate-3 rounded-[2.5rem] scale-105 blur-2xl transition-all duration-500 group-hover:rotate-6 group-hover:opacity-70" />
+                                <div className="relative w-full max-w-[450px] aspect-square rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white mx-auto lg:mx-0">
                                     {team[0].image_base64 ? (
                                         <img
                                             src={team[0].image_base64}
@@ -51,86 +61,101 @@ export default function About() {
                                         </div>
                                     )}
 
-
+                                    {/* Name Badge */}
+                                    <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/50">
+                                        <div className="font-serif text-xl font-bold text-[#0F2E1C]">{team[0].name}</div>
+                                        <div className="text-emerald-600 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{team[0].role}</div>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-center h-full">
-                                <p className="text-stone-500">No team members found</p>
+                            <div className="flex items-center justify-center h-full min-h-[300px] border-2 border-dashed border-stone-200 rounded-[2.5rem] bg-stone-50">
+                                <div className="text-center space-y-2">
+                                    <User className="w-12 h-12 text-stone-300 mx-auto" />
+                                    <p className="text-stone-500 font-medium">No team members found</p>
+                                </div>
                             </div>
                         )}
                     </motion.div>
 
                     {/* RIGHT COLUMN: Mission & Vision */}
-                    <div className="space-y-8 lg:pt-0">
+                    <div className="space-y-10 lg:space-y-14">
                         {/* Vision */}
                         <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
+                            transition={{ duration: 0.8 }}
                             className="space-y-6"
                         >
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-widest">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-[0.2em] border border-emerald-100">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                 Our Vision
                             </div>
-                            <h2 className="text-4xl lg:text-2xl font-black text-stone-800 leading-tight">
-                                Cultivating a <span className="text-emerald-600">Greener</span> Future for Africa.
+                            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-stone-800 leading-tight">
+                                Cultivating a <span className="text-emerald-600 italic">Greener</span> Future for Africa.
                             </h2>
-                            <p className="text-lg text-stone-600 leading-relaxed font-medium">
+                            <p className="text-base md:text-lg text-stone-600 leading-relaxed">
                                 To pioneer a climate-resilient Africa where organic agriculture restores the land and fuels every community's long-term health and prosperity. We aim to be the continent's leading model for sustainable restoration.
                             </p>
                         </motion.div>
 
                         {/* Mission */}
                         <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="p-8 bg-stone-50 rounded-[2rem] border border-stone-100 relative overflow-hidden"
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="p-8 md:p-12 bg-[#F5F1E8] rounded-[2.5rem] border border-stone-100 relative overflow-hidden shadow-sm"
                         >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl" />
-                            <div className="relative z-10 space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-stone-200 text-stone-600 text-xs font-bold uppercase tracking-widest">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                            <div className="relative z-10 space-y-6">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-stone-200 text-stone-600 text-[10px] font-black uppercase tracking-[0.2em]">
                                     Our Mission
                                 </div>
-                                <h3 className="text-2xl font-black text-stone-800">Nourish, Educate, Restore.</h3>
-                                <p className="text-stone-600 leading-relaxed">
-                                    To nourish Africa naturally by producing <span className="text-emerald-700 font-bold">100% chemical-free</span> organic produce and distributing high-value seedlings. We are committed to educating farmers through ancestral wisdom combined with modern ecological restoration.
+                                <h3 className="font-serif text-2xl md:text-3xl font-bold text-stone-800">Nourish, Educate, Restore.</h3>
+                                <p className="text-stone-600 leading-relaxed text-sm md:text-base">
+                                    To nourish Africa naturally by producing <span className="text-emerald-700 font-bold underline decoration-emerald-200 decoration-4 underline-offset-4">100% chemical-free</span> organic produce and distributing high-value seedlings. We are committed to educating farmers through ancestral wisdom combined with modern ecological restoration.
                                 </p>
                             </div>
                         </motion.div>
-
-
                     </div>
                 </div>
             </section>
 
-            {/* 3. Core Values / Goals - Optimized Grid for Mobile/Desktop */}
-            <section className="py-12 md:py-20 bg-white">
-                <div className="container mx-auto px-4 max-w-6xl">
-                    <div className="text-center mb-10 md:mb-16">
-                        <h2 className="text-[25px] font-black text-stone-800 uppercase tracking-tight">Core Values</h2>
-                    </div>
+            {/* 3. Core Values - Optimized Grid */}
+            <section className="py-20 md:py-32 bg-stone-50/50">
+                <div className="container mx-auto px-4 max-w-7xl">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-16 space-y-4"
+                    >
+                        <span className="text-stone-400 text-[10px] font-black uppercase tracking-[0.3em]">● Guiding Principles</span>
+                        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-stone-800">Our Core Values</h2>
+                    </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {[
-                            { value: "100% Natural", desc: "Producing nutrition without any chemical or synthetic interventions." },
-                            { value: "Eco Verified", desc: "Strict adherence to protecting local biodiversity and soil health." },
-                            { value: "Community Focus", desc: "Empowering and educating small-holder farmers across Africa." }
+                            { value: "100% Natural", icon: "🌱", desc: "Producing nutrition without any chemical or synthetic interventions." },
+                            { value: "Eco Verified", icon: "🌍", desc: "Strict adherence to protecting local biodiversity and soil health." },
+                            { value: "Community Focus", icon: "🤝", desc: "Empowering and educating small-holder farmers across Africa." }
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, scale: 0.98 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="p-6 md:p-10 rounded-2xl border border-stone-50 bg-stone-50/20 flex flex-col items-center text-center hover:bg-emerald-50/30 transition-colors duration-300"
+                                transition={{ delay: i * 0.1, duration: 0.6 }}
+                                whileHover={{ y: -8 }}
+                                className="p-10 rounded-3xl border border-stone-200/50 bg-white shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all duration-500 text-center"
                             >
-                                <h4 className="text-[20px] font-black text-emerald-600 mb-2 md:mb-4 uppercase tracking-tight">{item.value}</h4>
-                                <p className="text-[17px] text-stone-500 leading-relaxed">{item.desc}</p>
+                                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl mb-8 mx-auto">
+                                    {item.icon}
+                                </div>
+                                <h4 className="font-serif text-xl font-bold text-stone-800 mb-4">{item.value}</h4>
+                                <p className="text-stone-500 leading-relaxed text-sm">{item.desc}</p>
                             </motion.div>
                         ))}
                     </div>

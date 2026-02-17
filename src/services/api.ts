@@ -70,8 +70,8 @@ export const api = {
 
   // Categories
   getCategories: async () => {
-    // Mock categories for now as per AdminPage usage
-    return { success: true, data: ["Vegetables", "Fruits", "Grains", "Livestock"] };
+    const response = await axios.get(`${PRODUCTS_URL}/categories`);
+    return response.data;
   },
 
   // Team/Founder Endpoints
@@ -89,6 +89,20 @@ export const api = {
   },
   deleteTeamMember: async (id: string) => {
     const response = await axios.delete(`${TEAM_URL}/${id}`);
+    return response.data;
+  },
+
+  // Orders
+  createOrder: async (orderData: any) => {
+    const response = await axios.post(`${BASE_URL}/orders`, orderData);
+    return response.data;
+  },
+  getAllOrders: async () => {
+    const response = await axios.get(`${BASE_URL}/orders`);
+    return response.data;
+  },
+  updateOrderStatus: async (id: string, status: string) => {
+    const response = await axios.put(`${BASE_URL}/orders/${id}/status`, { status });
     return response.data;
   }
 };

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Product } from '@/services/api';
 import { cn } from '@/lib/utils';
+import { ArrowRight } from "lucide-react";
 
 interface HeroSliderProps {
     products: Product[];
@@ -36,87 +38,102 @@ export function HeroSlider({ products, loading, className }: HeroSliderProps) {
     }
 
     return (
-        <section className={cn("relative h-[60vh] w-full overflow-hidden rounded-lg group mb-12 shadow-2xl", className)}>
+        <section className={cn("relative h-[70vh] w-full overflow-hidden rounded-[2rem] group mb-16 shadow-2xl", className)}>
             <AnimatePresence initial={false}>
                 <motion.div
                     key={current}
-                    initial={{ x: "100%" }}
-                    animate={{ x: 0 }}
-                    exit={{ x: "-100%" }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.2 }}
                     className="absolute inset-0"
                 >
-                    {/* High-Resolution Animated Image Wrapper */}
+                    {/* Organic Animated Image */}
                     <motion.div
-                        initial={{ scale: 1 }}
-                        animate={{ scale: 1.1 }}
-                        transition={{ duration: 10, ease: "linear" }}
+                        initial={{ scale: 1.15 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 15, ease: "easeOut" }}
                         className="h-full w-full"
                     >
                         <img
                             src={products[current].image_base64 || "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000"}
                             alt={products[current].name}
-                            className="h-full w-full object-cover brightness-[0.85] contrast-[1.1]"
-                            style={{ imageRendering: 'high-quality' as any }}
+                            className="h-full w-full object-cover brightness-[0.9]"
                         />
                     </motion.div>
 
-                    {/* Multi-layered Cinematic Overlays */}
-                    <div className="absolute inset-0 bg-linear-to-b from-black/30 via-transparent to-black/70" />
-                    <div className="absolute inset-0 bg-linear-to-r from-black/70 via-transparent to-transparent" />
+                    {/* Natural Cinematic Overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F2E1C]/90 via-[#0F2E1C]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0F2E1C]/40 via-transparent to-transparent" />
 
-                    {/* Film Grain Quality Mask */}
-                    <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3")` }}
-                    />
-
-                    {/* Content Section with Motion Typography */}
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="container mx-auto px-8 md:px-16">
-                            <div className="max-w-2xl space-y-4">
+                    {/* Content Section with Premium Typography */}
+                    <div className="absolute inset-0 flex items-end pb-24 md:pb-32">
+                        <div className="container mx-auto px-8 md:px-20">
+                            <div className="max-w-3xl space-y-6">
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.4, duration: 0.8 }}
-                                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-widest backdrop-blur-md"
+                                    className="flex items-center gap-3"
                                 >
-                                    Farm-Fresh Category
+                                    <div className="h-px w-8 bg-[#2E7D32]" />
+                                    <span className="text-emerald-400 text-xs font-bold uppercase tracking-[0.3em] backdrop-blur-sm">
+                                        FRESH FROM THE FIELD
+                                    </span>
                                 </motion.div>
                                 <motion.h1
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.6, duration: 0.8 }}
-                                    className="text-5xl md:text-7xl font-black text-white leading-tight tracking-tight"
+                                    transition={{ delay: 0.6, duration: 1 }}
+                                    className="font-serif text-6xl md:text-8xl text-white leading-[0.9] tracking-tight"
                                 >
                                     {products[current].name}
                                 </motion.h1>
                                 <motion.p
-                                    initial={{ opacity: 0, y: 40 }}
+                                    initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.8, duration: 0.8 }}
-                                    className="text-xl md:text-2xl text-stone-200 font-medium max-w-lg line-clamp-2 drop-shadow-md"
+                                    transition={{ delay: 0.8, duration: 1 }}
+                                    className="text-lg md:text-xl text-stone-200 font-medium max-w-xl line-clamp-2 italic opacity-90"
                                 >
-                                    {products[current].description}
+                                    {products[current].description || "Experience the pure essence of Ethiopian nature, delivered from our fields to your table."}
                                 </motion.p>
+
+                                <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 1, duration: 1 }}
+                                    className="pt-4"
+                                >
+                                    <Link to="/products" className="inline-flex items-center gap-4 px-8 py-4 bg-[#2E7D32] text-white font-bold rounded-full hover:bg-[#0F2E1C] transition-all shadow-xl hover:shadow-[#0F2E1C]/20 text-sm uppercase tracking-widest">
+                                        Shop This Harvest
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </motion.div>
                             </div>
                         </div>
                     </div>
                 </motion.div>
             </AnimatePresence>
 
-            {/* Premium Navigation Indicators */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-30">
-                {products.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setCurrent(i)}
-                        className="relative group p-2"
-                    >
-                        <div className={`h-1.5 transition-all duration-500 rounded-full bg-white/30 group-hover:bg-white/50 ${i === current ? 'w-10 bg-emerald-400' : 'w-4'
-                            }`} />
-                    </button>
-                ))}
+            {/* Natural Navigation Indicators */}
+            <div className="absolute bottom-10 right-10 flex items-center gap-6 z-30">
+                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
+                    {String(current + 1).padStart(2, '0')} <span className="mx-2">/</span> {String(products.length).padStart(2, '0')}
+                </p>
+                <div className="flex gap-2.5">
+                    {products.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setCurrent(i)}
+                            className="group py-4"
+                        >
+                            <div className={`h-[3px] transition-all duration-700 rounded-full shadow-sm ${i === current ? 'w-12 bg-white' : 'w-4 bg-white/30 group-hover:bg-white/50'
+                                }`} />
+                        </button>
+                    ))}
+                </div>
             </div>
         </section>
+
     );
 }
