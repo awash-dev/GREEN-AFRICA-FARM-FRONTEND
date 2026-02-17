@@ -1,9 +1,12 @@
 import axios from "axios";
 
-const isLocal = window.location.hostname === "localhost";
-const API_URL = isLocal
-  ? "https://green-africa-farm-backend.vercel.app/api/products"
-  : "https://green-africa-farm-backend.vercel.app/api/products";
+// Using dynamic base URL for different environments
+const BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:3000/api"
+  : "https://green-africa-farm-backend.vercel.app/api";
+
+const PRODUCTS_URL = `${BASE_URL}/products`;
+const TEAM_URL = `${BASE_URL}/team`;
 
 export interface Product {
   id?: string | number;
@@ -22,53 +25,70 @@ export interface ProductInput {
   name: string;
   category: string;
   description: string;
-  description_am: string;
-  description_om: string;
+  description_am?: string;
+  description_om?: string;
   price: number;
-  image_base64: string;
+  image_base64?: string;
 }
 
-export interface ProductStats {
-  total: number;
-  totalValue: number;
+export interface TeamMember {
+  id?: string;
+  name: string;
+  role: string;
+  role_am?: string;
+  role_om?: string;
+  bio?: string;
+  bio_am?: string;
+  bio_om?: string;
+  image_base64?: string;
+  order?: number;
+  is_active?: boolean;
 }
 
 export const api = {
+  // Products Endpoints
   getAllProducts: async (params?: any) => {
-    const response = await axios.get(API_URL, { params });
+    const response = await axios.get(PRODUCTS_URL, { params });
     return response.data;
   },
-
   getProductById: async (id: string | number) => {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await axios.get(`${PRODUCTS_URL}/${id}`);
     return response.data;
   },
-
-  getCategories: async () => {
-    const response = await axios.get(`${API_URL}/categories`);
+  createProduct: async (product: any) => {
+    const response = await axios.post(PRODUCTS_URL, product);
     return response.data;
   },
-
-  getProductStats: async () => {
-    const response = await axios.get(`${API_URL}/stats`);
+  updateProduct: async (id: string | number, product: any) => {
+    const response = await axios.put(`${PRODUCTS_URL}/${id}`, product);
     return response.data;
   },
-
-  createProduct: async (product: ProductInput) => {
-    const response = await axios.post(API_URL, product);
-    return response.data;
-  },
-
-  updateProduct: async (
-    id: string | number,
-    product: Partial<ProductInput>
-  ) => {
-    const response = await axios.put(`${API_URL}/${id}`, product);
-    return response.data;
-  },
-
   deleteProduct: async (id: string | number) => {
-    const response = await axios.delete(`${API_URL}/${id}`);
+    const response = await axios.delete(`${PRODUCTS_URL}/${id}`);
     return response.data;
   },
+
+  // Categories
+  getCategories: async () => {
+    // Mock categories for now as per AdminPage usage
+    return { success: true, data: ["Vegetables", "Fruits", "Grains", "Livestock"] };
+  },
+
+  // Team/Founder Endpoints
+  getTeamMembers: async () => {
+    const response = await axios.get(TEAM_URL);
+    return response.data;
+  },
+  createTeamMember: async (member: Partial<TeamMember>) => {
+    const response = await axios.post(TEAM_URL, member);
+    return response.data;
+  },
+  updateTeamMember: async (id: string, member: Partial<TeamMember>) => {
+    const response = await axios.put(`${TEAM_URL}/${id}`, member);
+    return response.data;
+  },
+  deleteTeamMember: async (id: string) => {
+    const response = await axios.delete(`${TEAM_URL}/${id}`);
+    return response.data;
+  }
 };
