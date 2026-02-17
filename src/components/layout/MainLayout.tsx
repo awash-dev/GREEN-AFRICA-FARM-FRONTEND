@@ -13,7 +13,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     return (
         <div className="min-h-screen flex flex-col font-sans antialiased">
             {!isAdmin && <Navbar />}
-            <main className={`flex-1 ${isAdmin ? 'p-0 max-w-none' : 'container mx-auto px-4 py-8'}`}>
+            <main className="flex-1 flex flex-col">
                 {children}
             </main>
             {!isAdmin && <Footer />}

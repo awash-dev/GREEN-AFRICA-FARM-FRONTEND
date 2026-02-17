@@ -1,50 +1,83 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Leaf } from 'lucide-react';
+import { User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Logo } from './Logo';
+import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 export function Navbar() {
     const location = useLocation();
+    const [isScrolled, setIsScrolled] = useState(false);
 
-    const navLinks: { to: string; label: string }[] = [];
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
-        <nav className="sticky top-0 z-[999] border-b border-white/10 shadow-xl overflow-hidden bg-gradient-to-br from-[#1a3c18] via-[#2d5a27] to-[#1a3c18]">
-            <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+        <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            className={cn(
+                "sticky top-0 z-50 transition-all duration-300",
+                isScrolled
+                    ? "bg-white/80 backdrop-blur-lg border-b border-emerald-100 shadow-md py-0"
+                    : "bg-white border-b border-transparent py-2"
+            )}
+        >
+            <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo & Brand */}
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="relative">
-                        <img
-                            src="/logo.jpg"
-                            alt="Green Africa Farm"
-                            className="w-12 h-12 rounded-xl object-cover shadow-lg group-hover:scale-110 transition-transform duration-500 border-2 border-white/20"
-                        />
-                        <div className="absolute -bottom-1 -right-1 bg-[#eec90d] p-1 rounded-md shadow-sm">
-                            <Leaf className="h-3 w-3 text-[#1a3c18]" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-xl font-black text-white tracking-tighter leading-none">GREEN AFRICA</span>
-                        <span className="text-[10px] font-bold text-emerald-300 tracking-widest uppercase">Organic Farm</span>
-                    </div>
-                </Link>
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                >
+                    <Logo />
+                </motion.div>
 
-                {/* Navigation */}
-                <div className="flex items-center gap-4 md:gap-8">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.to}
-                            to={link.to}
-                            className={`relative text-[10px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.2em] transition-all duration-300 hover:text-emerald-300 py-2 ${location.pathname === link.to ? 'text-emerald-300' : 'text-white/80'
-                                }`}
-                        >
-                            {link.label}
-                            {location.pathname === link.to && (
-                                <span className="absolute bottom-0 left-0 w-full h-1 bg-[#eec90d] rounded-full" />
-                            )}
-                        </Link>
-                    ))}
+                {/* Navigation Links */}
+                <div className="hidden lg:flex items-center gap-10">
+                    {[
+                        { to: "/", label: "Home" },
+                        { to: "/products", label: "Our Products" },
+                        { to: "/about", label: "About Us" },
+                    ].map((link) => {
+                        const isActive = location.pathname === link.to;
+                        return (
+                            <Link
+                                key={link.to}
+                                to={link.to}
+                                className={cn(
+                                    "text-sm font-bold transition-all relative group py-2",
+                                    isActive ? "text-emerald-600" : "text-stone-600 hover:text-emerald-500"
+                                )}
+                            >
+                                {link.label}
+                                <motion.span
+                                    className={cn(
+                                        "absolute bottom-0 left-0 h-0.5 bg-emerald-500 rounded-full",
+                                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                                    )}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            </Link>
+                        );
+                    })}
+                </div>
 
+                {/* Right Actions */}
+                <div className="flex items-center gap-8">
+                    <Link
+                        to="/admin"
+                        className="flex items-center gap-2 text-sm font-bold text-stone-700 hover:text-emerald-600 transition-colors bg-stone-50 px-5 py-2.5 rounded-full border border-stone-100 hover:border-emerald-100 hover:shadow-sm"
+                    >
+                        <User className="h-4 w-4" />
+                        <span>Admin Portal</span>
+                    </Link>
                 </div>
             </div>
-        </nav>
+        </motion.nav>
     );
 }
