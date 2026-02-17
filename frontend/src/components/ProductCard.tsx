@@ -1,7 +1,9 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Product } from "@/services/api";
-import { Leaf } from "lucide-react";
+import { ShoppingBag, ArrowRight } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
     product: Product;
@@ -9,76 +11,149 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, language = 'en' }: ProductCardProps) {
+    const { addToCart } = useCart();
+    const [isAdded, setIsAdded] = useState(false);
+
     const getDescription = () => {
         if (language === 'am') return product.description_am || product.description;
         if (language === 'om') return product.description_om || product.description;
         return product.description;
     };
 
-    const description = getDescription();
+    const handleAddToCart = () => {
+        addToCart(product);
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 2500);
+    };
 
     return (
-        <Card className="group relative h-full flex flex-col overflow-hidden border-[#2d5a27]/10 bg-white/40 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(26,60,24,0.08)]">
-            {/* Image Section */}
-            <div className="relative aspect-[16/11] overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent z-10" />
-
-                {product.image_base64 ? (
-                    <img
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{
+                opacity: 1,
+                scale: 1,
+                y: 0
+            }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{
+                duration: 0.7,
+                ease: [0.33, 1, 0.68, 1]
+            }}
+            className="h-full"
+        >
+            <motion.div
+                whileHover={{
+                    y: -8,
+                    transition: {
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25
+                    }
+                }}
+                whileTap={{
+                    scale: 0.98,
+                    y: 0
+                }}
+                className="h-full bg-white rounded-xl border border-stone-200/60 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#2E7D32]/20 transition-all duration-500 flex flex-col group touch-manipulation"
+            >
+                {/* Image Section */}
+                <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-50">
+                    <motion.img
                         src={product.image_base64}
                         alt={product.name}
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                        className="h-full w-full object-cover"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                     />
-                ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#f8faf8] to-[#f0f4f0] space-y-3">
-                        <div className="p-4 rounded-full bg-emerald-50 text-emerald-600/30">
-                            <Leaf className="h-12 w-12" />
+
+                    {/* Organic Badge */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2, duration: 0.4 }}
+                        className="absolute top-3 left-3"
+                    >
+                        <div className="px-2.5 py-1 bg-white/95 backdrop-blur-sm rounded-lg text-[8px] font-bold uppercase tracking-wider text-[#2E7D32] shadow-md flex items-center gap-1">
+                            <span className="h-1 w-1 bg-[#2E7D32] rounded-full" />
+                            Organic
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3c18]/30">Fresh Harvest</span>
-                    </div>
-                )}
+                    </motion.div>
+                </div>
 
-                {/* Glassmorphism Badge */}
-                {product.category && (
-                    <div className="absolute left-3 top-3 z-20">
-                        <Badge className="border-white/20 bg-white/70 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a3c18] backdrop-blur-md shadow-sm">
-                            {product.category}
-                        </Badge>
-                    </div>
-                )}
-            </div>
-
-            {/* Content Section */}
-            <div className="flex flex-1 flex-col p-5">
-                <div className="flex-1 space-y-3">
-                    <div className="space-y-1">
-                        <h3 className="line-clamp-1 text-lg font-bold tracking-tight text-[#1a3c18] transition-colors group-hover:text-emerald-700">
+                {/* Content Section */}
+                <div className="flex-1 flex flex-col p-4 space-y-3">
+                    <div className="space-y-1.5">
+                        <p className="text-[8px] font-bold text-[#2E7D32] uppercase tracking-widest">
+                            {product.category || "Fresh Harvest"}
+                        </p>
+                        <h3 className="font-serif text-lg sm:text-xl text-[#0F2E1C] leading-tight group-hover:text-[#2E7D32] transition-colors duration-300">
                             {product.name}
                         </h3>
-                        <div className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600">
-                            <Leaf className="h-3 w-3" />
-                            <span>Locally Sourced</span>
-                        </div>
                     </div>
 
-                    <p className="line-clamp-2 text-xs leading-relaxed text-[#1a3c18]/60 font-medium">
-                        {description || 'Premium farm-fresh harvest, directly from our grounds to your home with care and quality.'}
-                    </p>
-                </div>
+                    {/* Description */}
+                    {getDescription() && (
+                        <p className="text-[11px] text-[#6D4C41] leading-relaxed opacity-60 line-clamp-2">
+                            {getDescription()}
+                        </p>
+                    )}
 
-                <div className="mt-5 pt-4 border-t border-[#2d5a27]/5">
-                    <div className="space-y-0.5">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#1a3c18]/30">Market Price</span>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black text-[#1a3c18]">{product.price.toFixed(2)}</span>
-                            <span className="text-xs font-bold text-emerald-600">ETB</span>
+                    {/* Price & Button */}
+                    <div className="mt-auto pt-3 space-y-3 border-t border-stone-100">
+                        <div className="flex items-baseline justify-between">
+                            <div className="flex items-baseline gap-1">
+                                <span className="font-serif text-2xl font-bold text-[#0F2E1C]">
+                                    {product.price.toFixed(0)}
+                                </span>
+                                <span className="text-[9px] font-bold text-[#6D4C41] uppercase">
+                                    ETB
+                                </span>
+                            </div>
                         </div>
+
+                        {/* Add to Cart Button */}
+                        <motion.button
+                            onClick={handleAddToCart}
+                            disabled={isAdded}
+                            whileTap={{ scale: 0.97 }}
+                            className={cn(
+                                "w-full h-10 rounded-lg font-bold uppercase tracking-wider text-[9px] transition-all duration-400 flex items-center justify-center gap-2",
+                                isAdded
+                                    ? "bg-emerald-50 text-[#2E7D32] border border-[#2E7D32]/30"
+                                    : "bg-[#0F2E1C] text-white hover:bg-[#2E7D32] shadow-md hover:shadow-lg"
+                            )}
+                        >
+                            <AnimatePresence mode="wait">
+                                {isAdded ? (
+                                    <motion.div
+                                        key="added"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <ShoppingBag className="h-3.5 w-3.5" />
+                                        <span>Added</span>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="add"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <span>Add to Basket</span>
+                                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.button>
                     </div>
                 </div>
-            </div>
-
-            {/* Decorative organic background element */}
-            <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-emerald-500/5 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        </Card>
+            </motion.div>
+        </motion.div>
     );
 }

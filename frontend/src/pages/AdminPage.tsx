@@ -17,11 +17,35 @@ import {
     LayoutGrid,
     PlusCircle,
     ArrowLeft,
-    Users
+    Users,
+    ShoppingBag
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-type AdminView = 'inventory' | 'manage' | 'team';
+type AdminView = 'inventory' | 'manage' | 'team' | 'orders';
+
+export interface OrderItem {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
+}
+
+export interface Order {
+    _id: string;
+    orderId: string;
+    customer: {
+        fullName: string;
+        phone: string;
+        address: string;
+        region: string;
+        notes?: string;
+    };
+    items: OrderItem[];
+    total: number;
+    status: 'pending' | 'processing' | 'delivered' | 'cancelled';
+    createdAt: string;
+}
 
 export function AdminPage() {
     const navigate = useNavigate();
@@ -29,6 +53,7 @@ export function AdminPage() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [team, setTeam] = useState<TeamMember[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [preview, setPreview] = useState<string | null>(null);
@@ -59,7 +84,19 @@ export function AdminPage() {
         fetchProducts();
         fetchCategories();
         fetchTeam();
+        fetchOrders();
     }, []);
+
+    const fetchOrders = async () => {
+        try {
+            const response = await api.getAllOrders();
+            if (response.success) {
+                setOrders(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch orders', error);
+        }
+    };
 
     const fetchCategories = async () => {
         try {
@@ -258,6 +295,18 @@ export function AdminPage() {
         }
     };
 
+    const handleUpdateOrderStatus = async (id: string, status: string) => {
+        try {
+            const response = await api.updateOrderStatus(id, status);
+            if (response.success) {
+                setNotification({ type: 'success', message: 'Order status updated!' });
+                fetchOrders();
+            }
+        } catch (error) {
+            setNotification({ type: 'error', message: 'Failed to update order status' });
+        }
+    };
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8; // Optimized for mobile view
 
@@ -335,6 +384,15 @@ export function AdminPage() {
                                 >
                                     <Users className="h-3.5 w-3.5 mr-1.5" />
                                     About Team
+                                </Button>
+                                <Button
+                                    variant={activeView === 'orders' ? 'default' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setActiveView('orders')}
+                                    className={`rounded-md text-xs font-bold transition-all h-8 px-3 ${activeView === 'orders' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 hover:bg-emerald-700' : 'text-stone-600 hover:bg-white hover:text-emerald-700'}`}
+                                >
+                                    <ShoppingBag className="h-3.5 w-3.5 mr-1.5" />
+                                    Orders
                                 </Button>
                             </div>
                         </div>
@@ -597,6 +655,93 @@ export function AdminPage() {
                                 </form>
                             </CardContent>
                         </Card>
+                    ) : activeView === 'orders' ? (
+                        <div className="space-y-6 pb-20">
+                            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                                <h3 className="font-bold text-stone-800">Customer Orders</h3>
+                                <div className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                                    {orders.length} TOTAL ORDERS
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                {orders.length === 0 ? (
+                                    <div className="py-20 text-center bg-white rounded-2xl border border-stone-100 italic text-stone-400">
+                                        No orders placed yet.
+                                    </div>
+                                ) : (
+                                    orders.map(order => (
+                                        <Card key={order._id} className="overflow-hidden border-stone-200 hover:border-emerald-200 transition-colors shadow-sm">
+                                            <div className="bg-stone-50/50 p-4 border-b border-stone-100 flex flex-wrap justify-between items-center gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="bg-emerald-600 text-white px-3 py-1 rounded-lg font-mono text-sm font-bold">
+                                                        {order.orderId}
+                                                    </div>
+                                                    <div className="text-xs font-bold text-stone-400 uppercase tracking-widest">
+                                                        {new Date(order.createdAt).toLocaleDateString()}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
+                                                        className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all cursor-pointer outline-none ${order.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-200' :
+                                                                order.status === 'processing' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                                                    order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                                        'bg-stone-100 text-stone-500 border-stone-200'
+                                                            }`}
+                                                    >
+                                                        <option value="pending">Pending</option>
+                                                        <option value="processing">Processing</option>
+                                                        <option value="delivered">Delivered</option>
+                                                        <option value="cancelled">Cancelled</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <CardContent className="p-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <div className="space-y-4">
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Customer</p>
+                                                            <p className="font-bold text-stone-900">{order.customer.fullName}</p>
+                                                            <p className="text-sm text-stone-600">{order.customer.phone}</p>
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Delivery Address</p>
+                                                            <p className="text-sm text-stone-800">{order.customer.address}, {order.customer.region}</p>
+                                                        </div>
+                                                        {order.customer.notes && (
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Notes</p>
+                                                                <p className="text-xs text-stone-500 italic bg-stone-50 p-3 rounded-xl border border-stone-100">{order.customer.notes}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Items</p>
+                                                        <div className="space-y-2 border-t border-stone-100 pt-4">
+                                                            {order.items.map((item, idx) => (
+                                                                <div key={idx} className="flex justify-between items-center text-sm">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="bg-stone-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-stone-500">{item.quantity}x</span>
+                                                                        <span className="font-medium text-stone-700">{item.name}</span>
+                                                                    </div>
+                                                                    <span className="font-mono text-stone-400">{(item.price * item.quantity).toLocaleString()}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <div className="flex justify-between items-center pt-4 border-t border-stone-100">
+                                                            <span className="font-bold text-stone-900 uppercase tracking-widest text-xs">Total</span>
+                                                            <span className="font-black text-emerald-700 text-lg">{order.total.toLocaleString()} ETB</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     ) : (
                         <div className="space-y-4 flex flex-col h-full overflow-hidden">
                             {/* Search & Stats */}

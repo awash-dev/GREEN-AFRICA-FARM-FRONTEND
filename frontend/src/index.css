@@ -39,72 +39,54 @@
 
 @layer base {
   :root {
-    /* Farm Theme Colors - Earthy Greens and Natural Tones */
-    --background: 45 40% 98%;
-    /* Warm, natural off-white/beige */
-    --foreground: 142 40% 10%;
-    /* Very dark forest green */
+    /* Natural UI - Organic & Elegant Palette */
+    --background: 40 30% 97%; /* #FAF8F3 - Light Sand */
+    --foreground: 145 50% 12%; /* #0F2E1C - Deep Forest Green */
 
-    --card: 0 0% 100%;
-    --card-foreground: 142 40% 10%;
+    --card: 45 40% 98%; /* Warm Cream - #F5F1E8 */
+    --card-foreground: 145 50% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 142 40% 10%;
+    --popover: 45 40% 98%;
+    --popover-foreground: 145 50% 12%;
 
-    --primary: 142 60% 25%;
-    /* Deep Forest Green */
+    --primary: 145 50% 12%; /* #0F2E1C - Deep Forest Green */
     --primary-foreground: 45 40% 98%;
 
-    --secondary: 45 40% 90%;
-    /* Light Earthy Stone */
-    --secondary-foreground: 142 40% 20%;
+    --secondary: 142 45% 34%; /* #2E7D32 - Soft Leaf Green */
+    --secondary-foreground: 45 40% 98%;
 
-    --muted: 45 20% 94%;
-    --muted-foreground: 142 10% 40%;
+    --muted: 25 24% 90%; /* Soft Earth/Cream muted */
+    --muted-foreground: 25 20% 40%; /* Earth Brown muted */
 
-    --accent: 38 60% 50%;
-    /* Harvest Gold/Orange accent */
+    --accent: 15 26% 34%; /* #6D4C41 - Earth Brown */
     --accent-foreground: 45 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 142 20% 90%;
-    --input: 142 20% 90%;
-    --ring: 142 60% 25%;
+    --border: 25 20% 88%;
+    --input: 25 20% 88%;
+    --ring: 145 50% 12%;
 
-    --radius: 1rem;
-    /* More rounded for a modern feel */
+    --radius: 1.5rem; /* Softened 2xl defaults */
   }
 
   .dark {
-    --background: 142 40% 5%;
+    /* Maintain natural feel even in dark mode */
+    --background: 145 50% 8%;
     --foreground: 45 20% 95%;
 
-    --card: 142 40% 8%;
+    --card: 145 50% 10%;
     --card-foreground: 45 20% 95%;
 
-    --popover: 142 40% 8%;
-    --popover-foreground: 45 20% 95%;
+    --primary: 142 45% 34%;
+    --primary-foreground: 145 50% 8%;
 
-    --primary: 142 50% 40%;
-    --primary-foreground: 142 40% 5%;
-
-    --secondary: 142 30% 15%;
-    --secondary-foreground: 45 20% 95%;
-
-    --muted: 142 20% 12%;
-    --muted-foreground: 142 10% 60%;
-
-    --accent: 38 60% 40%;
+    --accent: 15 26% 45%;
     --accent-foreground: 45 20% 95%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 45 20% 95%;
-
-    --border: 142 20% 15%;
-    --input: 142 20% 15%;
-    --ring: 142 50% 40%;
+    --border: 145 20% 15%;
+    --ring: 142 45% 34%;
   }
 }
 
@@ -131,8 +113,16 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Outfit", "Inter", sans-serif;
-    background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 100%);
+    font-family: "Poppins", "Inter", sans-serif;
+    background-image: radial-gradient(circle at 50% 50%, rgba(15, 46, 28, 0.03) 0%, transparent 100%);
+  }
+
+  .font-serif {
+    font-family: "Playfair Display", serif;
+  }
+
+  .font-sans {
+    font-family: "Poppins", sans-serif;
   }
 }
 
