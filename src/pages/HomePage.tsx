@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp } from 'lucide-react';
+import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp, Play, Settings, Activity, Fingerprint, X } from 'lucide-react';
 import { api, Product } from '@/services/api';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { ProductCard } from '@/components/ProductCard';
@@ -12,6 +12,7 @@ export function HomePage() {
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [showBackToTop, setShowBackToTop] = useState(false);
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const { scrollYProgress } = useScroll();
     const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
     const barOpacity = useTransform(scrollYProgress, [0, 0.05], [0, 1]);
@@ -451,6 +452,108 @@ export function HomePage() {
                     </div>
                 </div>
             </section >
+
+            {/* Journey Video Section - New */}
+            <section className="relative w-full h-screen flex items-center overflow-hidden">
+                {/* Background Image */}
+                <div className="absolute inset-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=2000"
+                        alt="Farmer Field"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                </div>
+
+                <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10 py-20">
+                    <div className="max-w-4xl space-y-8">
+                        {/* Label Badge */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-[#F4D03F] text-black text-[10px] md:text-xs font-black uppercase tracking-widest rounded-full"
+                        >
+                            <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
+                            Watch Our Video
+                        </motion.div>
+
+                        {/* Heading */}
+                        <motion.h2
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-3xl md:text-7xl font-sans font-bold text-white leading-[1.1] tracking-tight"
+                        >
+                            Follow the journey of pure farming where nature, technique & passion come together
+                        </motion.h2>
+
+                        {/* Floating Play Button */}
+                        <div className="relative pt-10 md:pt-0 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2">
+                            <motion.button
+                                onClick={() => setIsVideoModalOpen(true)}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="relative w-24 h-24 md:w-32 md:h-32 bg-[#F4D03F] rounded-full flex items-center justify-center shadow-2xl group overflow-hidden"
+                            >
+                                <Play className="w-8 h-8 md:w-10 md:h-10 text-black fill-black" />
+
+                                {/* Rotating Text Wrapper */}
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-60 transition-opacity"
+                                >
+                                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                                        <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
+                                        <text className="text-[9px] uppercase font-black tracking-[0.2em] fill-black">
+                                            <textPath xlinkHref="#circlePath">
+                                                Get Fresh Today • Get Fresh Today •
+                                            </textPath>
+                                        </text>
+                                    </svg>
+                                </motion.div>
+                            </motion.button>
+                        </div>
+                    </div>
+
+                    {/* USPs at Bottom */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 md:mt-24">
+                        {[
+                            {
+                                icon: Settings,
+                                title: "Our Sustainable Farming in Action",
+                                desc: "From planting to harvesting, explore the processes that ensure our food is clean, and natural."
+                            },
+                            {
+                                icon: Activity,
+                                title: "Experience the Passion",
+                                desc: "Watch the dedication, love, and hands on effort that goes into every step of our organic journey."
+                            },
+                            {
+                                icon: Fingerprint,
+                                title: "What Make Our Produce Truly Pure",
+                                desc: "From planting to harvesting, explore the processes that ensure our food is clean, and natural."
+                            }
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 + i * 0.1 }}
+                                className="flex gap-4 md:gap-5"
+                            >
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#F4D03F] flex items-center justify-center shrink-0 shadow-lg">
+                                    <item.icon className="w-6 h-6 md:w-7 md:h-7 text-black" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-white font-bold text-lg md:text-xl leading-tight">{item.title}</h4>
+                                    <p className="text-white/70 text-[10px] md:text-sm leading-relaxed">{item.desc}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* Shop by Category Section */}
             < section className="w-full py-12 md:py-20 bg-white" >
@@ -1364,6 +1467,44 @@ export function HomePage() {
                     )
                 }
             </AnimatePresence >
+
+            {/* Video Modal */}
+            <AnimatePresence>
+                {isVideoModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
+                    >
+                        <motion.button
+                            onClick={() => setIsVideoModalOpen(false)}
+                            className="absolute top-6 right-6 p-4 text-white hover:text-[#F4D03F] transition-colors z-[110]"
+                        >
+                            <X className="w-8 h-8 md:w-10 md:h-10" />
+                        </motion.button>
+
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src="https://www.youtube.com/embed/TCk6LeLZF0M?autoplay=1"
+                                title="Farm Journey"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                className="w-full h-full"
+                            ></iframe>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
 
     );
