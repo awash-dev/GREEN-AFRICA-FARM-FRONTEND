@@ -64,24 +64,20 @@ export function HomePage() {
             />
 
             {/* Hero Section - Static with Overlay */}
-            <section className="relative w-full h-[calc(100vh-5rem)] overflow-hidden">
+            <section className="relative w-full h-[calc(100vh-90px)] overflow-hidden">
                 {/* Background Image with Parallax */}
                 <motion.div
-                    className="absolute inset-0 will-change-transform"
                     style={{ y: heroY, scale: heroScale }}
+                    className="absolute inset-0 will-change-transform"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
                 >
-                    {loading ? (
-                        <div className="w-full h-full bg-gradient-to-br from-green-800 to-green-900 animate-pulse" />
-                    ) : (
-                        <img
-                            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000"
-                            alt="Organic Farm"
-                            className="w-full h-full object-cover shadow-inner"
-                        />
-                    )}
+                    <img
+                        src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000"
+                        alt="Organic Farm"
+                        className="w-full h-full object-cover shadow-inner"
+                    />
                     {/* Gradient Overlays */}
                     <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/40 to-transparent" />
                     <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
@@ -89,33 +85,20 @@ export function HomePage() {
 
                 {/* Content Container */}
                 <div className="relative h-full container mx-auto px-4 md:px-6 max-w-7xl">
-                    <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Left Content */}
-                        {loading ? (
-                            <div className="space-y-8 text-white z-10">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 h-10 w-40 animate-pulse" />
-                                <div className="space-y-3">
-                                    <div className="h-16 sm:h-20 md:h-24 lg:h-28 xl:h-32 bg-white/10 rounded-lg animate-pulse" />
-                                    <div className="h-10 w-48 bg-white/10 rounded-lg animate-pulse" />
-                                </div>
-                                <div className="flex gap-3">
-                                    <div className="h-12 w-32 bg-white/10 rounded-lg animate-pulse" />
-                                    <div className="h-12 w-28 bg-white/10 rounded-lg animate-pulse" />
-                                </div>
-                            </div>
-                        ) : (
                         <motion.div
                             initial={{ opacity: 0, x: -60 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="space-y-8 text-white z-10"
+                            className="space-y-6 md:space-y-8 text-white z-10"
                         >
                             {/* Label */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4, duration: 0.6 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mt-4 md:mt-8"
                             >
                                 <Leaf className="h-4 w-4 text-[#F4D03F]" />
                                 <span className="text-xs font-bold uppercase tracking-widest">100% Organic & Natural</span>
@@ -123,9 +106,9 @@ export function HomePage() {
 
                             {/* Main Heading with Word Animation */}
                             <div className="space-y-3 md:space-y-4">
-                                <motion.h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+                                <motion.h1 className="font-serif text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[45px] leading-[1.1] drop-shadow-md">
                                     <div className="flex flex-wrap">
-                                        {["The", "Power", "of"].map((word, i) => (
+                                        {["Premium", "Organic", "Produce"].map((word, i) => (
                                             <div key={i} className="overflow-hidden mr-3 pb-1">
                                                 <motion.span
                                                     initial={{ y: "150%" }}
@@ -153,7 +136,7 @@ export function HomePage() {
                                             }}
                                             className="text-[#F4D03F] inline-block will-change-transform translate-z-0"
                                         >
-                                            Organic Farming
+                                            From Ethiopian Highlands
                                         </motion.span>
                                     </div>
                                 </motion.h1>
@@ -162,9 +145,9 @@ export function HomePage() {
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
-                                    className="text-sm md:text-lg text-white/90 leading-relaxed max-w-xl"
+                                    className="text-sm md:text-base lg:text-sm text-white/90 leading-relaxed max-w-xl"
                                 >
-                                    Farm-fresh, chemical-free produce grown with love and delivered straight to your table. Experience the true taste of nature.
+                                    Fresh, chemical-free bounty grown in the fertile volcanic soils of Ethiopia. Directly from our local farms to your kitchen.
                                 </motion.p>
                             </div>
 
@@ -209,7 +192,7 @@ export function HomePage() {
                                 ))}
                             </motion.div>
                         </motion.div>
-                        )}
+
 
                         {/* Right - Floating Farmer Image (Desktop Only) */}
                         <motion.div
@@ -232,7 +215,7 @@ export function HomePage() {
                                 <motion.div
                                     animate={{ y: [0, -20, 0] }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative w-80 h-80 rounded-full overflow-hidden border-8 border-white/20 shadow-2xl"
+                                    className="relative w-72 h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white/20 shadow-2xl"
                                 >
                                     <img
                                         src="https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=800"
@@ -246,11 +229,11 @@ export function HomePage() {
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
-                                    className="absolute -bottom-4 -right-4 bg-[#F4D03F] rounded-full p-6 shadow-2xl"
+                                    className="absolute bottom-0 -right-2 lg:-bottom-4 lg:-right-4 bg-[#F4D03F] rounded-full p-4 lg:p-6 shadow-2xl"
                                 >
                                     <div className="text-center">
-                                        <div className="text-3xl font-black text-[#0F2E1C]">10+</div>
-                                        <div className="text-[9px] font-bold uppercase tracking-wider text-[#0F2E1C]/70">Years</div>
+                                        <div className="text-2xl lg:text-3xl font-black text-[#0F2E1C]">10+</div>
+                                        <div className="text-[8px] lg:text-[9px] font-bold uppercase tracking-wider text-[#0F2E1C]/70">Years</div>
                                     </div>
                                 </motion.div>
                             </div>
@@ -263,7 +246,7 @@ export function HomePage() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2, duration: 0.8 }}
-                    className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-white/60"
+                    className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-white/60"
                 >
                     <span className="text-[10px] uppercase tracking-widest font-bold">Explore</span>
                     <motion.div
@@ -274,17 +257,17 @@ export function HomePage() {
                         <motion.div className="w-1 h-1.5 bg-white/60 rounded-full" />
                     </motion.div>
                 </motion.div>
-            </section>
+            </section >
 
             {/* Features/USP Bar - Warm Beige */}
-            <section className="w-full py-10 md:py-20 bg-[#F5F1E8]">
+            <section className="relative w-full py-10 md:py-16 bg-[#F5F1E8] z-20">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { icon: ShieldCheck, title: "100% Organic", desc: "Certified natural farming" },
-                            { icon: Zap, title: "Farm to Table", desc: "Harvested & delivered in 24h" },
-                            { icon: Globe, title: "Eco-Friendly", desc: "Sustainable land practices" },
-                            { icon: Heart, title: "Local Impact", desc: "Directly supporting farmers" }
+                            { icon: ShieldCheck, title: "100% Organic", desc: "Ethiopian Highland Certified" },
+                            { icon: Zap, title: "Farm to Table", desc: "Local harvest delivered fast" },
+                            { icon: Globe, title: "Eco-Friendly", desc: "Protecting our rich biodiversity" },
+                            { icon: Heart, title: "Local Impact", desc: "Supporting our farming communities" }
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
@@ -317,10 +300,10 @@ export function HomePage() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* About Our Farm Section - White */}
-            <section className="w-full py-12 md:py-24 bg-white overflow-hidden">
+            < section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                         {/* Images */}
@@ -392,7 +375,7 @@ export function HomePage() {
                                 </motion.span>
                                 <motion.h2 className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#0F2E1C] leading-tight">
                                     <div className="flex flex-wrap">
-                                        {["From", "soil", "harvest,", "we", "believe", "in", "clean", "&", "conscious", "farming"].map((word, i) => (
+                                        {["From", "the", "cradle", "of", "humanity,", "we", "bring", "the", "purest", "harvest"].map((word, i) => (
                                             <div key={i} className="overflow-hidden mr-2 pb-1">
                                                 <motion.span
                                                     initial={{ y: "120%" }}
@@ -417,7 +400,7 @@ export function HomePage() {
                                     transition={{ delay: 0.4, duration: 0.8 }}
                                     className="text-sm md:text-base text-[#6D4C41] leading-relaxed"
                                 >
-                                    From soil preparation to the final harvest, we use sustainable, chemical-free methods that protect biodiversity, enrich the soil, and preserve natural resources.
+                                    Ethiopia has a rich tradition of organic farming that spans centuries. We combine this ancestral wisdom with modern sustainable practices to protect our soil and biodiversity.
                                 </motion.p>
                                 <motion.p
                                     initial={{ opacity: 0, y: 20 }}
@@ -425,7 +408,7 @@ export function HomePage() {
                                     transition={{ delay: 0.5, duration: 0.8 }}
                                     className="text-sm md:text-base text-[#6D4C41] leading-relaxed"
                                 >
-                                    We are committed to farming in a way that respects both the land and the people who depend on it.
+                                    Our commitment is to restore the land while providing the most nutrient-dense produce to our local communities.
                                 </motion.p>
                             </div>
 
@@ -462,10 +445,10 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Shop by Category Section */}
-            <section className="w-full py-12 md:py-20 bg-white">
+            < section className="w-full py-12 md:py-20 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div className="space-y-4">
@@ -523,10 +506,10 @@ export function HomePage() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Our Products Section - Soft Green */}
-            <section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center">
+            < section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="space-y-12 md:space-y-16">
                         <motion.div
@@ -570,15 +553,7 @@ export function HomePage() {
                             </div>
                         </motion.div>
 
-                        {loading ? (
-                            <div className="flex flex-col items-center justify-center py-20 gap-6">
-                                <div className="relative">
-                                    <Loader2 className="h-12 w-12 animate-spin text-[#2E7D32]" />
-                                    <Leaf className="h-4 w-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#0F2E1C]" />
-                                </div>
-                                <p className="font-bold text-[#0F2E1C]/40 uppercase tracking-[0.3em] text-[10px]">Tending to the fields...</p>
-                            </div>
-                        ) : products.length === 0 ? (
+                        {products.length === 0 ? (
                             <div className="py-20 text-stone-400 font-bold font-serif italic text-xl">
                                 The fields are resting. Check back soon for the next harvest.
                             </div>
@@ -607,10 +582,10 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Why Choose Us Section - Warm Beige */}
-            <section className="w-full py-16 md:py-24 bg-[#F5F1E8]">
+            < section className="w-full py-16 md:py-24 bg-[#F5F1E8]" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -632,7 +607,7 @@ export function HomePage() {
                                 </motion.span>
                                 <motion.h2 className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#0F2E1C] leading-tight">
                                     <div className="flex flex-wrap">
-                                        {["Committed", "to", "honest", "and", "clean", "sustainable", "farming"].map((word, i) => (
+                                        {["Nourishing", "Ethiopia", "through", "honest", "and", "clean", "conscious", "farming"].map((word, i) => (
                                             <div key={i} className="overflow-hidden mr-2">
                                                 <motion.span
                                                     initial={{ y: "150%" }}
@@ -657,7 +632,7 @@ export function HomePage() {
                                     transition={{ delay: 0.4 }}
                                     className="text-sm md:text-base text-[#6D4C41] leading-relaxed opacity-80"
                                 >
-                                    We believe in delivering food that's grown with care, transparency, and respect for the environment. Every step we take is focused on bringing you fresh.
+                                    We believe in delivering food that's grown with integrity, respecting the unique agricultural heritage of our Ethiopian highlands. Every harvest is a testament to our land.
                                 </motion.p>
                             </div>
 
@@ -751,20 +726,20 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Seed to Soul Section - White */}
-            <section className="w-full py-16 md:py-24 bg-white">
+            < section className="w-full py-16 md:py-24 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="bg-white/60 backdrop-blur-sm rounded-[3rem] md:rounded-[4rem] border border-stone-200/40 p-8 md:p-16 lg:p-20">
                         <div className="max-w-6xl mx-auto space-y-12 md:space-y-16">
                             <div className="text-center space-y-4">
-                                <span className="text-emerald-700 text-[10px] font-black uppercase tracking-[0.4em]">OUR PHILOSOPHY</span>
+                                <span className="text-emerald-700 text-[10px] font-black uppercase tracking-[0.4em]">OUR ETHIOPIAN PHILOSOPHY</span>
                                 <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl text-[#0F2E1C]">
                                     Seed to <span className="italic">Soul</span>
                                 </h2>
                                 <p className="text-sm md:text-base text-[#6D4C41] font-medium max-w-lg mx-auto italic opacity-70">
-                                    A slow, organic journey from the rich soil of Africa to your heart and home.
+                                    A slow, organic journey from the rich volcanic soil of Ethiopia to your heart and home.
                                 </p>
                             </div>
 
@@ -825,12 +800,12 @@ export function HomePage() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Testimonials Section - Clean & Premium */}
-            <section className="w-full py-20 md:py-28 bg-gradient-to-br from-[#F5F1E8] via-white to-[#E8F0E6]/30 relative overflow-hidden">
+            < section className="w-full py-20 md:py-28 bg-gradient-to-br from-[#F5F1E8] via-white to-[#E8F0E6]/30 relative overflow-hidden" >
                 {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
+                < div className="absolute top-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
@@ -965,12 +940,12 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* How It Works Section - Modern Timeline */}
-            <section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden">
+            < section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
+                < div className="absolute top-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
@@ -1099,12 +1074,12 @@ export function HomePage() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Trusted By / Clients Section */}
-            <section className="w-full py-20 md:py-28 bg-white relative overflow-hidden">
+            < section className="w-full py-20 md:py-28 bg-white relative overflow-hidden" >
                 {/* Decorative Background */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
+                < div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
                     {/* Header */}
@@ -1261,10 +1236,10 @@ export function HomePage() {
                         </div>
                     </motion.div>
                 </div>
-            </section>
+            </section >
 
             {/* FAQ Section */}
-            <section className="w-full py-16 md:py-24 bg-white">
+            < section className="w-full py-16 md:py-24 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -1363,26 +1338,28 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Back to Top Button */}
             <AnimatePresence>
-                {showBackToTop && (
-                    <motion.button
-                        initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.5, y: 20 }}
-                        whileHover={{ scale: 1.1, y: -5 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={scrollToTop}
-                        className="fixed bottom-8 right-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
-                        aria-label="Back to Top"
-                    >
-                        <ArrowUp className="h-6 w-6 group-hover:animate-bounce" />
-                    </motion.button>
-                )}
-            </AnimatePresence>
-        </div>
+                {
+                    showBackToTop && (
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+                            whileHover={{ scale: 1.1, y: -5 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={scrollToTop}
+                            className="fixed bottom-8 right-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
+                            aria-label="Back to Top"
+                        >
+                            <ArrowUp className="h-6 w-6 group-hover:animate-bounce" />
+                        </motion.button>
+                    )
+                }
+            </AnimatePresence >
+        </div >
 
     );
 }

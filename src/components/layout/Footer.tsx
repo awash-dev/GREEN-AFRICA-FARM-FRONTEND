@@ -11,7 +11,7 @@ export function Footer() {
                     <div className="space-y-6">
                         <Logo variant="light" className="justify-center md:justify-start" />
                         <p className="text-sm text-emerald-100/70 leading-relaxed">
-                            Sustainable farming for a better tomorrow. Join us in our journey to nourish Africa naturally.
+                            Sustainable farming for a better tomorrow. Join us in our journey to nourish Ethiopia naturally.
                         </p>
                     </div>
 
@@ -46,21 +46,13 @@ export function Footer() {
 
                 <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
                     <p className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                        <span>© 2026 Green Africa Farms. All Rights Reserved.</span>
+                        <span>© 2026 Green Ethiopia Farms. All Rights Reserved.</span>
                         <span className="hidden md:inline">•</span>
-                        <span className="text-white/40">Designed & Built by</span>
-                        <a
-                            href="https://github.com/awash-dev"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-emerald-400 hover:text-emerald-300 font-bold text-sm transition-colors underline decoration-dotted underline-offset-2"
-                        >
-                            awash-dev
-                        </a>
+                        <span className="text-white/40">Grown in the Highlands</span>
                     </p>
                     <div className="flex items-center gap-4">
                         <Mail className="h-4 w-4" />
-                        <span>info@greenafricafarms.com</span>
+                        <span>harvest@greenethiopiafarms.com</span>
                     </div>
                 </div>
             </div>
