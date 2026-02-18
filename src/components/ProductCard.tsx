@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 {/* Image Section */}
                 <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-stone-100">
                     <motion.img
-                        src={product.image_base64}
+                        src={product.image_base64 || "/photo_9_2026-02-18_22-40-51.jpg"}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

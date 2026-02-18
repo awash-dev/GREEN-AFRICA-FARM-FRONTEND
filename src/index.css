@@ -91,7 +91,6 @@
 }
 
 @layer base {
-
   *,
   *::before,
   *::after {
@@ -114,7 +113,11 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Poppins", "Inter", sans-serif;
-    background-image: radial-gradient(circle at 50% 50%, rgba(15, 46, 28, 0.03) 0%, transparent 100%);
+    background-image: radial-gradient(
+      circle at 50% 50%,
+      rgba(15, 46, 28, 0.03) 0%,
+      transparent 100%
+    );
   }
 
   .font-serif {
@@ -144,7 +147,6 @@
   }
 
   @keyframes float {
-
     0%,
     100% {
       transform: translateY(0);
@@ -162,5 +164,31 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .animate-scroll {
+    animation: scroll 60s linear infinite;
+  }
+
+  .animate-scroll-reverse {
+    animation: scroll-reverse 60s linear infinite;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes scroll-reverse {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
   }
 }

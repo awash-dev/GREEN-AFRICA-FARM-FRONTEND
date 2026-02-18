@@ -8,7 +8,8 @@ import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export function ProductsPage() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
@@ -16,45 +17,50 @@ export function ProductsPage() {
     const [language, setLanguage] = useState<'en' | 'am' | 'om'>('en');
 
     useEffect(() => {
-        fetchCategories();
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                const [productsRes, categoriesRes] = await Promise.all([
+                    api.getAllProducts({ limit: 1000 }), // Fetch everything
+                    api.getCategories()
+                ]);
+
+                if (productsRes.success) {
+                    setAllProducts(productsRes.data);
+                    setFilteredProducts(productsRes.data);
+                }
+                if (categoriesRes.success) {
+                    setCategories(['All', ...categoriesRes.data]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch initial data', error);
+                setCategories(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadInitialData();
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchProducts(products.length === 0);
-        }, search || category ? 400 : 0);
-        return () => clearTimeout(timer);
-    }, [search, category]);
+        // Fast client-side filtering including localized fields
+        const filtered = allProducts.filter(product => {
+            const searchLower = search.toLowerCase();
+            const matchesSearch = !search ||
+                product.name.toLowerCase().includes(searchLower) ||
+                product.description?.toLowerCase().includes(searchLower) ||
+                product.description_am?.toLowerCase().includes(searchLower) ||
+                product.description_om?.toLowerCase().includes(searchLower) ||
+                product.category?.toLowerCase().includes(searchLower);
 
-    const fetchCategories = async () => {
-        try {
-            const response = await api.getCategories();
-            if (response.success) {
-                setCategories(['All', ...response.data]);
-            }
-        } catch (error) {
-            console.error('Failed to fetch categories', error);
-            setCategories(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
-        }
-    };
+            const matchesCategory = !category || category === 'All' ||
+                product.category?.toLowerCase() === category.toLowerCase();
 
-    const fetchProducts = async (showFullLoading: boolean) => {
-        if (showFullLoading) setLoading(true);
-        try {
-            const params: any = { limit: 100 };
-            if (search) params.search = search;
-            if (category && category !== 'All') params.category = category.trim();
-
-            const response = await api.getAllProducts(params);
-            if (response.success) {
-                setProducts(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch products', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredProducts(filtered);
+    }, [search, category, allProducts]);
 
     return (
         <div className="min-h-screen bg-[#FAF8F3]">
@@ -125,7 +131,7 @@ export function ProductsPage() {
                 </div>
 
                 {/* Product Grid */}
-                {products.length === 0 && !loading ? (
+                {filteredProducts.length === 0 && !loading ? (
                     <div className="text-center py-16 md:py-24 border-2 md:border-4 border-dashed border-stone-100 rounded-4xl md:rounded-[3rem] bg-stone-50/30">
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <Search className="h-8 w-8 md:h-10 md:w-10 text-stone-200" />
@@ -135,7 +141,7 @@ export function ProductsPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-4">
-                        {products.map((product: Product) => (
+                        {filteredProducts.map((product: Product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
