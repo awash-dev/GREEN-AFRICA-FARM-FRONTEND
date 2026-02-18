@@ -2,6 +2,7 @@ import { Product } from "@/services/api";
 import { useCart } from "@/context/CartContext";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
     product: Product;
@@ -59,17 +60,31 @@ export function ProductCard({ product }: ProductCardProps) {
                 </div>
 
                 {/* Content Section */}
-                <div className="flex flex-col p-3 space-y-0.5">
-                    <h3 className="text-sm font-bold text-stone-900 line-clamp-1 uppercase tracking-tight">
-                        {product.name}
-                    </h3>
-                    <p className="text-[11px] text-stone-500 font-medium lowercase first-letter:uppercase">
-                        {product.category || "General"}
-                    </p>
-                    <div className="pt-1">
-                        <span className="text-sm font-bold text-[#e74c3c]">
+                <div className="flex flex-col p-3 space-y-2">
+                    <div className="space-y-0.5">
+                        <h3 className="text-[13px] font-bold text-stone-900 line-clamp-1 uppercase tracking-tight">
+                            {product.name}
+                        </h3>
+                        <p className="text-[10px] text-stone-500 font-medium lowercase first-letter:uppercase">
+                            {product.category || "General"}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                        <span className="text-[14px] font-bold text-[#e74c3c]">
                             ETB {product.price.toFixed(2)}
                         </span>
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleBuyNow();
+                            }}
+                            className="bg-black text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#2E7D32] transition-colors shadow-sm flex items-center gap-1.5 active:scale-95"
+                        >
+                            <ShoppingCart className="h-3 w-3" />
+                            BUY
+                        </button>
                     </div>
                 </div>
             </motion.div>
