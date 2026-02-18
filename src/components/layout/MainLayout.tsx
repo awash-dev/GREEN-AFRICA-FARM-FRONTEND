@@ -23,7 +23,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                     <Footer />
                     {/* Telegram Floating Button */}
                     <motion.a
-                        href="https://t.me/greenafricafarm"
+                        href="https://t.me/Paul939369"
                         target="_blank"
                         rel="noopener noreferrer"
                         initial={{ scale: 0, opacity: 0 }}
