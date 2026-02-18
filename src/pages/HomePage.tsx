@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Leaf, Loader2, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp } from 'lucide-react';
+import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp } from 'lucide-react';
 import { api, Product } from '@/services/api';
+import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { ProductCard } from '@/components/ProductCard';
 
 export function HomePage() {
@@ -57,6 +59,9 @@ export function HomePage() {
 
     return (
         <div className="flex flex-col bg-[#FAF8F3] overflow-x-hidden">
+            <AnimatePresence>
+                {loading && <FullScreenLoader key="loader" />}
+            </AnimatePresence>
             {/* Scroll Progress Bar (Premium Mobile Detail) */}
             <motion.div
                 style={{ width: progressWidth, opacity: barOpacity }}
