@@ -75,7 +75,7 @@ export function HomePage() {
                     style={{ y: heroY, scale: heroScale }}
                     className="absolute inset-0 will-change-transform"
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    animate={{ opacity: loading ? 0 : 1 }}
                     transition={{ duration: 1 }}
                 >
                     <img
@@ -94,14 +94,14 @@ export function HomePage() {
                         {/* Left Content */}
                         <motion.div
                             initial={{ opacity: 0, x: -60 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            animate={!loading ? { opacity: 1, x: 0 } : {}}
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="space-y-6 md:space-y-8 text-white z-10"
                         >
                             {/* Label */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 0.4, duration: 0.6 }}
                                 className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mt-4 md:mt-8"
                             >
@@ -117,7 +117,7 @@ export function HomePage() {
                                             <div key={i} className="overflow-hidden mr-3 pb-1">
                                                 <motion.span
                                                     initial={{ y: "150%" }}
-                                                    animate={{ y: 0 }}
+                                                    animate={!loading ? { y: 0 } : {}}
                                                     transition={{
                                                         delay: 0.5 + i * 0.1,
                                                         duration: 0.8,
@@ -133,7 +133,7 @@ export function HomePage() {
                                     <div className="overflow-hidden">
                                         <motion.span
                                             initial={{ y: "150%" }}
-                                            animate={{ y: 0 }}
+                                            animate={!loading ? { y: 0 } : {}}
                                             transition={{
                                                 delay: 0.9,
                                                 duration: 1,
@@ -148,7 +148,7 @@ export function HomePage() {
 
                                 <motion.p
                                     initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    animate={!loading ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
                                     className="text-sm md:text-base lg:text-sm text-white/90 leading-relaxed max-w-xl"
                                 >
@@ -159,7 +159,7 @@ export function HomePage() {
                             {/* CTA Buttons */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 1.3, duration: 0.6 }}
                                 className="flex flex-wrap gap-3 md:gap-4"
                             >
@@ -181,7 +181,7 @@ export function HomePage() {
                             {/* Trust Badges */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 1.5, duration: 0.6 }}
                                 className="flex flex-wrap gap-4 md:gap-6 pt-2 md:pt-4"
                             >
@@ -202,14 +202,14 @@ export function HomePage() {
                         {/* Right - Floating Farmer Image (Desktop Only) */}
                         <motion.div
                             initial={{ opacity: 0, x: 60, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            animate={!loading ? { opacity: 1, x: 0, scale: 1 } : {}}
                             transition={{ duration: 1, delay: 0.6, type: "spring" }}
                             className="hidden lg:flex justify-center items-center relative"
                         >
                             <div className="relative">
                                 {/* Decorative Circle */}
                                 <motion.div
-                                    animate={{ rotate: 360 }}
+                                    animate={!loading ? { rotate: 360 } : {}}
                                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                                     className="absolute inset-0 -z-10"
                                 >
@@ -218,7 +218,7 @@ export function HomePage() {
 
                                 {/* Farmer Image */}
                                 <motion.div
-                                    animate={{ y: [0, -20, 0] }}
+                                    animate={!loading ? { y: [0, -20, 0] } : {}}
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                     className="relative w-72 h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white/20 shadow-2xl"
                                 >
@@ -232,7 +232,7 @@ export function HomePage() {
                                 {/* Badge */}
                                 <motion.div
                                     initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
+                                    animate={!loading ? { scale: 1 } : {}}
                                     transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
                                     className="absolute bottom-0 -right-2 lg:-bottom-4 lg:-right-4 bg-[#F4D03F] rounded-full p-4 lg:p-6 shadow-2xl"
                                 >
