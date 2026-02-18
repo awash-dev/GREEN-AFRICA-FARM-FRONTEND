@@ -98,7 +98,7 @@ export function ProductCard({ product, language = 'en' }: ProductCardProps) {
                     )}
 
                     {/* Price & Button */}
-                    <div className="mt-auto pt-3 space-y-3 border-t border-stone-100">
+                    <div className="mt-auto pt-3 space-y-2 border-t border-stone-100">
                         <div className="flex items-baseline justify-between">
                             <div className="flex items-baseline gap-1">
                                 <span className="font-serif text-2xl font-bold text-[#0F2E1C]">

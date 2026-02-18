@@ -4,7 +4,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { Input } from '@/components/ui/input';
 import { Search, Globe } from 'lucide-react';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
     Select,
@@ -70,8 +70,7 @@ export function ProductsPage() {
             </AnimatePresence>
 
             <div className="space-y-6 md:space-y-12 px-2 md:px-6 max-w-[1440px] mx-auto py-8 md:py-12">
-                {/* Header & Search Section */}
-                {/* Header Section */}
+                {/* Modern Header Section */}
                 <div className="flex flex-col items-center text-center space-y-4 max-w-3xl mx-auto">
                     <div className="space-y-2">
                         <div className="flex items-center justify-center gap-2 text-emerald-600">
@@ -80,24 +79,24 @@ export function ProductsPage() {
                             <span className="h-px w-4 bg-emerald-600/30"></span>
                         </div>
                         <h1 className="font-serif text-3xl md:text-5xl text-[#0F2E1C] leading-none">
-                            Ethiopian Highland <span className="italic text-[#2E7D32]">Harvest</span>
+                            Our Fresh <span className="italic text-[#2E7D32]">Produce</span>
                         </h1>
                     </div>
 
-                    {/* Modern Search Section */}
-                    <div className="w-full space-y-6">
+                    {/* Modern Search & Filter Dashboard */}
+                    <div className="w-full space-y-4 sticky top-[90px] z-50 bg-[#FAF8F3]/80 backdrop-blur-xl py-3 px-1 -mx-1 rounded-2xl shadow-sm md:static md:bg-transparent md:backdrop-blur-none md:shadow-none md:py-0">
                         {/* Search Input Container */}
                         <div className="relative group max-w-2xl mx-auto">
                             <div className="absolute inset-0 bg-emerald-500/5 blur-2xl rounded-full group-hover:bg-emerald-500/10 transition-colors duration-500" />
-                            <div className="relative bg-white border border-stone-100 rounded-2xl shadow-xl shadow-stone-200/40 p-1 flex items-center gap-2">
+                            <div className="relative bg-white border border-stone-200/50 rounded-2xl shadow-xl shadow-stone-200/20 p-1 flex items-center gap-2">
                                 <div className="pl-4 pr-1 text-stone-400">
                                     <Search className="h-5 w-5" />
                                 </div>
                                 <Input
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Search fresh produce..."
-                                    className="flex-1 h-12 md:h-14 border-none bg-transparent text-base focus-visible:ring-0 font-medium placeholder:text-stone-300"
+                                    placeholder="Search for vegetables, fruits..."
+                                    className="flex-1 h-12 md:h-14 border-none bg-transparent text-sm md:text-base focus-visible:ring-0 font-medium placeholder:text-stone-300"
                                 />
                                 <div className="hidden md:flex pr-2 items-center gap-2">
                                     <div className="h-8 w-px bg-stone-100 mx-2" />
@@ -116,42 +115,40 @@ export function ProductsPage() {
                             </div>
                         </div>
 
-                        {/* Language Selection for Mobile */}
-                        <div className="flex md:hidden justify-center items-center gap-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Preferred Language</span>
-                            <div className="flex bg-stone-100 p-1 rounded-xl">
-                                {['en', 'am', 'om'].map((lang) => (
-                                    <button
-                                        key={lang}
-                                        onClick={() => setLanguage(lang as any)}
-                                        className={cn(
-                                            "px-4 py-1.5 rounded-lg text-[10px] font-black transition-all uppercase",
-                                            language === lang ? "bg-white text-[#2E7D32] shadow-sm" : "text-stone-400"
-                                        )}
-                                    >
-                                        {lang === 'en' ? 'EN' : lang === 'am' ? 'አማ' : 'ORM'}
-                                    </button>
-                                ))}
+                        {/* Category Dashboard - Mobile Horizontal Scroll */}
+                        <div className="space-y-3 pt-2">
+                            <div className="flex items-center justify-between md:justify-center px-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Categories</span>
+                                <div className="flex md:hidden bg-stone-100 p-1 rounded-lg">
+                                    {['en', 'am', 'om'].map((lang) => (
+                                        <button
+                                            key={lang}
+                                            onClick={() => setLanguage(lang as any)}
+                                            className={cn(
+                                                "px-3 py-1 rounded text-[8px] font-black transition-all uppercase",
+                                                language === lang ? "bg-white text-[#2E7D32] shadow-sm" : "text-stone-400"
+                                            )}
+                                        >
+                                            {lang}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Category Chips - Scrollable for Mobile */}
-                        <div className="space-y-3">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 text-center">Filter by Category</p>
-                            <div className="flex items-center gap-2 overflow-x-auto pb-4 px-2 no-scrollbar justify-start md:justify-center">
+                            <div className="flex items-center gap-2 overflow-x-auto pb-2 px-1 no-scrollbar justify-start md:justify-center">
                                 {categories.map((cat) => (
-                                    <button
+                                    <motion.button
                                         key={cat}
+                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => setCategory(cat === 'All' ? '' : cat)}
                                         className={cn(
-                                            "whitespace-nowrap px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 border",
+                                            "whitespace-nowrap px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 border",
                                             (category === cat || (cat === 'All' && !category))
-                                                ? "bg-[#0F2E1C] text-white border-[#0F2E1C] shadow-lg shadow-[#0F2E1C]/20 scale-105"
-                                                : "bg-white text-stone-500 border-stone-100 hover:border-emerald-200 hover:text-emerald-700 hover:bg-emerald-50/50"
+                                                ? "bg-[#0F2E1C] text-white border-[#0F2E1C] shadow-lg shadow-[#0F2E1C]/20"
+                                                : "bg-white text-stone-500 border-stone-200 hover:border-emerald-200 hover:text-emerald-700 hover:bg-emerald-50/50"
                                         )}
                                     >
                                         {cat}
-                                    </button>
+                                    </motion.button>
                                 ))}
                             </div>
                         </div>

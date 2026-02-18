@@ -46,7 +46,7 @@ export function Footer() {
 
                 <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
                     <p className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                        <span>© 2026 Green African Farms. All Rights Reserved.</span>
+                        <span>© 2026 Green Africa Farm. All Rights Reserved.</span>
                         <span className="hidden md:inline">•</span>
                         <span className="text-white/40 italic">
                             Build and powered by{' '}
@@ -62,7 +62,7 @@ export function Footer() {
                     </p>
                     <div className="flex items-center gap-4">
                         <Mail className="h-4 w-4" />
-                        <span>harvest@greenafricanfarms.com</span>
+                        <span>harvest@greenafricafarm.com</span>
                     </div>
                 </div>
             </div>

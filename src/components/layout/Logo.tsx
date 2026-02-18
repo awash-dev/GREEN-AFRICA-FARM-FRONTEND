@@ -29,10 +29,10 @@ export function Logo({ className = "", variant = 'dark' }: LogoProps) {
 
             <div className="flex flex-col">
                 <span className={`text-xl font-extrabold uppercase tracking-tight leading-none ${textColor}`}>
-                    Green African
+                    Green Africa
                 </span>
                 <span className={`text-[13px] font-black uppercase tracking-[0.2em] mt-0.5 ${subTextColor}`}>
-                    Farms
+                    Farm
                 </span>
             </div>
         </Link>
