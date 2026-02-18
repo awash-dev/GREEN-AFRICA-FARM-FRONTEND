@@ -309,7 +309,7 @@ export function HomePage() {
             </section >
 
             {/* About Our Farm Section - White */}
-            < section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
+            <section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                         {/* Images */}
@@ -487,76 +487,82 @@ export function HomePage() {
                             Follow the journey of pure farming where nature, technique & passion come together
                         </motion.h2>
 
-                        {/* Floating Play Button */}
-                        <div className="relative pt-10 md:pt-0 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2">
+                        {/* Play Button & Extra Info - Now on Left */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 pt-4">
                             <motion.button
                                 onClick={() => setIsVideoModalOpen(true)}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                className="relative w-24 h-24 md:w-32 md:h-32 bg-[#F4D03F] rounded-full flex items-center justify-center shadow-2xl group overflow-hidden"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="relative w-20 h-20 md:w-24 md:h-24 bg-[#F4D03F] rounded-full flex items-center justify-center shadow-2xl group shrink-0"
                             >
-                                <Play className="w-8 h-8 md:w-10 md:h-10 text-black fill-black" />
+                                <Play className="w-6 h-6 md:w-8 md:h-8 text-black fill-black" />
 
                                 {/* Rotating Text Wrapper */}
                                 <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-60 transition-opacity"
+                                    className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-60 transition-opacity scale-110"
                                 >
                                     <svg viewBox="0 0 100 100" className="w-full h-full">
-                                        <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
-                                        <text className="text-[9px] uppercase font-black tracking-[0.2em] fill-black">
-                                            <textPath xlinkHref="#circlePath">
-                                                Get Fresh Today • Get Fresh Today •
+                                        <path id="circlePathSmall" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
+                                        <text className="text-[10px] uppercase font-black tracking-[0.2em] fill-black">
+                                            <textPath xlinkHref="#circlePathSmall">
+                                                Watch Journey • Watch Journey •
                                             </textPath>
                                         </text>
                                     </svg>
                                 </motion.div>
                             </motion.button>
-                        </div>
-                    </div>
 
-                    {/* USPs at Bottom */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 md:mt-24">
-                        {[
-                            {
-                                icon: Settings,
-                                title: "Our Sustainable Farming in Action",
-                                desc: "From planting to harvesting, explore the processes that ensure our food is clean, and natural."
-                            },
-                            {
-                                icon: Activity,
-                                title: "Experience the Passion",
-                                desc: "Watch the dedication, love, and hands on effort that goes into every step of our organic journey."
-                            },
-                            {
-                                icon: Fingerprint,
-                                title: "What Make Our Produce Truly Pure",
-                                desc: "From planting to harvesting, explore the processes that ensure our food is clean, and natural."
-                            }
-                        ].map((item, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 + i * 0.1 }}
-                                className="flex gap-4 md:gap-5"
-                            >
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#F4D03F] flex items-center justify-center shrink-0 shadow-lg">
-                                    <item.icon className="w-6 h-6 md:w-7 md:h-7 text-black" />
-                                </div>
-                                <div className="space-y-2">
-                                    <h4 className="text-white font-bold text-lg md:text-xl leading-tight">{item.title}</h4>
-                                    <p className="text-white/70 text-[10px] md:text-sm leading-relaxed">{item.desc}</p>
-                                </div>
-                            </motion.div>
-                        ))}
+                            <div className="space-y-1">
+                                <p className="text-[#F4D03F] font-serif italic text-lg md:text-xl">The Farm Documentary</p>
+                                <p className="text-white/60 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">6:45 Minutes • Cinematic Experience</p>
+                                <p className="text-white/40 text-[9px] md:text-[10px] max-w-xs leading-relaxed">Discover how we cultivate life in the Ethiopian highlands through traditional wisdom and sustainable techniques.</p>
+                            </div>
+                        </div>
+
+                        {/* USPs - Now internal and strictly on the left */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pt-12 md:pt-16">
+                            {[
+                                {
+                                    icon: Settings,
+                                    title: "Sustainable Farming",
+                                    desc: "From planting to harvesting, explore the processes that ensure pure food."
+                                },
+                                {
+                                    icon: Activity,
+                                    title: "Experience Passion",
+                                    desc: "Watch the dedication and effort that goes into every step."
+                                },
+                                {
+                                    icon: Fingerprint,
+                                    title: "Truly Pure Produce",
+                                    desc: "Traditional wisdom meets modern sustainable practices."
+                                }
+                            ].map((item, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 + i * 0.1 }}
+                                    className="flex flex-col items-start gap-4"
+                                >
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-[#F4D03F] flex items-center justify-center shrink-0 shadow-lg">
+                                        <item.icon className="w-5 h-5 md:w-6 md:h-6 text-black" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h4>
+                                        <p className="text-white/50 text-[10px] md:text-xs leading-relaxed max-w-[200px]">{item.desc}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Shop by Category Section */}
-            < section className="w-full py-12 md:py-20 bg-white" >
+            <section className="w-full py-12 md:py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div className="space-y-4">
@@ -617,7 +623,7 @@ export function HomePage() {
             </section >
 
             {/* Our Products Section - Soft Green */}
-            < section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center" >
+            <section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center" >
                 <div className="container mx-auto px-2 md:px-6 max-w-[1440px]">
                     <div className="space-y-12 md:space-y-16">
                         <motion.div
@@ -693,7 +699,7 @@ export function HomePage() {
             </section >
 
             {/* Why Choose Us Section - Warm Beige */}
-            < section className="w-full py-16 md:py-24 bg-[#F5F1E8]" >
+            <section className="w-full py-16 md:py-24 bg-[#F5F1E8]" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -837,7 +843,7 @@ export function HomePage() {
             </section >
 
             {/* Seed to Soul Section - White */}
-            < section className="w-full py-16 md:py-24 bg-white" >
+            <section className="w-full py-16 md:py-24 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="bg-white/60 backdrop-blur-sm rounded-[3rem] md:rounded-[4rem] border border-stone-200/40 p-8 md:p-16 lg:p-20">
                         <div className="max-w-6xl mx-auto space-y-12 md:space-y-16">
@@ -911,9 +917,9 @@ export function HomePage() {
             </section >
 
             {/* Testimonials Section - Clean & Premium */}
-            < section className="w-full py-20 md:py-28 bg-gradient-to-br from-[#F5F1E8] via-white to-[#E8F0E6]/30 relative overflow-hidden" >
+            <section className="w-full py-20 md:py-28 bg-gradient-to-br from-[#F5F1E8] via-white to-[#E8F0E6]/30 relative overflow-hidden" >
                 {/* Decorative Elements */}
-                < div className="absolute top-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
@@ -1051,9 +1057,9 @@ export function HomePage() {
             </section >
 
             {/* How It Works Section - Modern Timeline */}
-            < section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
+            <section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
                 {/* Decorative Elements */}
-                < div className="absolute top-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
@@ -1185,9 +1191,9 @@ export function HomePage() {
             </section >
 
             {/* Trusted By / Clients Section */}
-            < section className="w-full py-20 md:py-28 bg-white relative overflow-hidden" >
+            <section className="w-full py-20 md:py-28 bg-white relative overflow-hidden" >
                 {/* Decorative Background */}
-                < div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
                     {/* Header */}
@@ -1347,7 +1353,7 @@ export function HomePage() {
             </section >
 
             {/* FAQ Section */}
-            < section className="w-full py-16 md:py-24 bg-white" >
+            <section className="w-full py-16 md:py-24 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -1459,7 +1465,7 @@ export function HomePage() {
                             whileHover={{ scale: 1.1, y: -5 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={scrollToTop}
-                            className="fixed bottom-8 right-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
+                            className="fixed bottom-8 left-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
                             aria-label="Back to Top"
                         >
                             <ArrowUp className="h-6 w-6 group-hover:animate-bounce" />
@@ -1470,41 +1476,43 @@ export function HomePage() {
 
             {/* Video Modal */}
             <AnimatePresence>
-                {isVideoModalOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
-                    >
-                        <motion.button
-                            onClick={() => setIsVideoModalOpen(false)}
-                            className="absolute top-6 right-6 p-4 text-white hover:text-[#F4D03F] transition-colors z-[110]"
-                        >
-                            <X className="w-8 h-8 md:w-10 md:h-10" />
-                        </motion.button>
-
+                {
+                    isVideoModalOpen && (
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black relative"
-                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
                         >
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                src="https://www.youtube.com/embed/TCk6LeLZF0M?autoplay=1"
-                                title="Farm Journey"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                                className="w-full h-full"
-                            ></iframe>
+                            <motion.button
+                                onClick={() => setIsVideoModalOpen(false)}
+                                className="absolute top-6 right-6 p-4 text-white hover:text-[#F4D03F] transition-colors z-[110]"
+                            >
+                                <X className="w-8 h-8 md:w-10 md:h-10" />
+                            </motion.button>
+
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black relative"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/TCk6LeLZF0M?autoplay=1"
+                                    title="Farm Journey"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                    className="w-full h-full"
+                                ></iframe>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )
+                }
+            </AnimatePresence >
         </div >
 
     );
