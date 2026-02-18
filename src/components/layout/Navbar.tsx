@@ -170,7 +170,7 @@ export function Navbar() {
                             </div>
 
                             <div className="mt-auto pb-8 text-center relative z-10">
-                                <p className="text-[10px] font-black text-[#6D4C41]/30 uppercase tracking-[0.4em]">Green Ethiopia Farm 2026</p>
+                                <p className="text-[10px] font-black text-[#6D4C41]/30 uppercase tracking-[0.4em]">Green Africa Farm 2026</p>
                             </div>
                         </motion.div>
                     </div>
