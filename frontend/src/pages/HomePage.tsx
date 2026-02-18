@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Leaf, Loader2, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp } from 'lucide-react';
+import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp, Play, Settings, Activity, Fingerprint, X, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { api, Product } from '@/services/api';
+import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { ProductCard } from '@/components/ProductCard';
 
 export function HomePage() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [showBackToTop, setShowBackToTop] = useState(false);
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll();
     const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
     const barOpacity = useTransform(scrollYProgress, [0, 0.05], [0, 1]);
@@ -21,11 +27,14 @@ export function HomePage() {
         const fetchInitialData = async () => {
             try {
                 const [productsRes, categoriesRes] = await Promise.all([
-                    api.getAllProducts({ limit: 4 }),
+                    api.getAllProducts({ limit: 100 }), // Increased limit for better search coverage
                     api.getCategories()
                 ]);
 
-                if (productsRes.success) setProducts(productsRes.data);
+                if (productsRes.success) {
+                    setAllProducts(productsRes.data);
+                    setFilteredProducts(productsRes.data);
+                }
                 if (categoriesRes.success) setCategories(categoriesRes.data);
             } catch (error) {
                 console.error('Failed to fetch data', error);
@@ -48,6 +57,20 @@ export function HomePage() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        // Fast client-side filtering including localized fields
+        const filtered = allProducts.filter(product => {
+            const searchLower = searchQuery.toLowerCase();
+            return !searchQuery ||
+                product.name.toLowerCase().includes(searchLower) ||
+                product.category?.toLowerCase().includes(searchLower) ||
+                product.description?.toLowerCase().includes(searchLower) ||
+                product.description_am?.toLowerCase().includes(searchLower) ||
+                product.description_om?.toLowerCase().includes(searchLower);
+        });
+        setFilteredProducts(filtered);
+    }, [searchQuery, allProducts]);
+
     const scrollToTop = () => {
         window.scrollTo({
             top: 0,
@@ -55,8 +78,20 @@ export function HomePage() {
         });
     };
 
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const { scrollLeft, clientWidth } = scrollRef.current;
+            const scrollAmount = clientWidth * 0.8;
+            const scrollTo = direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+            scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className="flex flex-col bg-[#FAF8F3] overflow-x-hidden">
+            <AnimatePresence>
+                {loading && <FullScreenLoader key="loader" />}
+            </AnimatePresence>
             {/* Scroll Progress Bar (Premium Mobile Detail) */}
             <motion.div
                 style={{ width: progressWidth, opacity: barOpacity }}
@@ -70,7 +105,7 @@ export function HomePage() {
                     style={{ y: heroY, scale: heroScale }}
                     className="absolute inset-0 will-change-transform"
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    animate={{ opacity: loading ? 0 : 1 }}
                     transition={{ duration: 1 }}
                 >
                     <img
@@ -89,14 +124,14 @@ export function HomePage() {
                         {/* Left Content */}
                         <motion.div
                             initial={{ opacity: 0, x: -60 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            animate={!loading ? { opacity: 1, x: 0 } : {}}
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="space-y-6 md:space-y-8 text-white z-10"
                         >
                             {/* Label */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 0.4, duration: 0.6 }}
                                 className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mt-4 md:mt-8"
                             >
@@ -112,7 +147,7 @@ export function HomePage() {
                                             <div key={i} className="overflow-hidden mr-3 pb-1">
                                                 <motion.span
                                                     initial={{ y: "150%" }}
-                                                    animate={{ y: 0 }}
+                                                    animate={!loading ? { y: 0 } : {}}
                                                     transition={{
                                                         delay: 0.5 + i * 0.1,
                                                         duration: 0.8,
@@ -128,7 +163,7 @@ export function HomePage() {
                                     <div className="overflow-hidden">
                                         <motion.span
                                             initial={{ y: "150%" }}
-                                            animate={{ y: 0 }}
+                                            animate={!loading ? { y: 0 } : {}}
                                             transition={{
                                                 delay: 0.9,
                                                 duration: 1,
@@ -143,7 +178,7 @@ export function HomePage() {
 
                                 <motion.p
                                     initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    animate={!loading ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
                                     className="text-sm md:text-base lg:text-sm text-white/90 leading-relaxed max-w-xl"
                                 >
@@ -154,7 +189,7 @@ export function HomePage() {
                             {/* CTA Buttons */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 1.3, duration: 0.6 }}
                                 className="flex flex-wrap gap-3 md:gap-4"
                             >
@@ -176,7 +211,7 @@ export function HomePage() {
                             {/* Trust Badges */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                animate={!loading ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: 1.5, duration: 0.6 }}
                                 className="flex flex-wrap gap-4 md:gap-6 pt-2 md:pt-4"
                             >
@@ -197,14 +232,14 @@ export function HomePage() {
                         {/* Right - Floating Farmer Image (Desktop Only) */}
                         <motion.div
                             initial={{ opacity: 0, x: 60, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            animate={!loading ? { opacity: 1, x: 0, scale: 1 } : {}}
                             transition={{ duration: 1, delay: 0.6, type: "spring" }}
                             className="hidden lg:flex justify-center items-center relative"
                         >
                             <div className="relative">
                                 {/* Decorative Circle */}
                                 <motion.div
-                                    animate={{ rotate: 360 }}
+                                    animate={!loading ? { rotate: 360 } : {}}
                                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                                     className="absolute inset-0 -z-10"
                                 >
@@ -213,7 +248,7 @@ export function HomePage() {
 
                                 {/* Farmer Image */}
                                 <motion.div
-                                    animate={{ y: [0, -20, 0] }}
+                                    animate={!loading ? { y: [0, -20, 0] } : {}}
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                     className="relative w-72 h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white/20 shadow-2xl"
                                 >
@@ -227,7 +262,7 @@ export function HomePage() {
                                 {/* Badge */}
                                 <motion.div
                                     initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
+                                    animate={!loading ? { scale: 1 } : {}}
                                     transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
                                     className="absolute bottom-0 -right-2 lg:-bottom-4 lg:-right-4 bg-[#F4D03F] rounded-full p-4 lg:p-6 shadow-2xl"
                                 >
@@ -303,7 +338,7 @@ export function HomePage() {
             </section >
 
             {/* About Our Farm Section - White */}
-            < section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
+            <section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                         {/* Images */}
@@ -447,8 +482,116 @@ export function HomePage() {
                 </div>
             </section >
 
+            {/* Journey Video Section - New */}
+            <section className="relative w-full h-screen flex items-center overflow-hidden">
+                {/* Background Image */}
+                <div className="absolute inset-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=2000"
+                        alt="Farmer Field"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                </div>
+
+                <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10 py-20">
+                    <div className="max-w-4xl space-y-8">
+                        {/* Label Badge */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-[#F4D03F] text-black text-[10px] md:text-xs font-black uppercase tracking-widest rounded-full"
+                        >
+                            <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
+                            Watch Our Video
+                        </motion.div>
+
+                        {/* Heading */}
+                        <motion.h2
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-3xl md:text-7xl font-sans font-bold text-white leading-[1.1] tracking-tight"
+                        >
+                            Follow the journey of pure farming where nature, technique & passion come together
+                        </motion.h2>
+
+                        {/* Play Button & Extra Info - Now on Left */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 pt-4">
+                            <motion.button
+                                onClick={() => setIsVideoModalOpen(true)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="relative w-20 h-20 md:w-24 md:h-24 bg-[#F4D03F] rounded-full flex items-center justify-center shadow-2xl group shrink-0"
+                            >
+                                <Play className="w-6 h-6 md:w-8 md:h-8 text-black fill-black" />
+
+                                {/* Rotating Text Wrapper */}
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 pointer-events-none opacity-20 group-hover:opacity-60 transition-opacity scale-110"
+                                >
+                                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                                        <path id="circlePathSmall" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
+                                        <text className="text-[10px] uppercase font-black tracking-[0.2em] fill-black">
+                                            <textPath xlinkHref="#circlePathSmall">
+                                                Watch Journey • Watch Journey •
+                                            </textPath>
+                                        </text>
+                                    </svg>
+                                </motion.div>
+                            </motion.button>
+
+                            <div className="space-y-1">
+                                <p className="text-[#F4D03F] font-serif italic text-lg md:text-xl">The Farm Documentary</p>
+                                <p className="text-white/60 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">6:45 Minutes • Cinematic Experience</p>
+                                <p className="text-white/40 text-[9px] md:text-[10px] max-w-xs leading-relaxed">Discover how we cultivate life in the Ethiopian highlands through traditional wisdom and sustainable techniques.</p>
+                            </div>
+                        </div>
+
+                        {/* USPs - Now internal and strictly on the left */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pt-12 md:pt-16">
+                            {[
+                                {
+                                    icon: Settings,
+                                    title: "Sustainable Farming",
+                                    desc: "From planting to harvesting, explore the processes that ensure pure food."
+                                },
+                                {
+                                    icon: Activity,
+                                    title: "Experience Passion",
+                                    desc: "Watch the dedication and effort that goes into every step."
+                                },
+                                {
+                                    icon: Fingerprint,
+                                    title: "Truly Pure Produce",
+                                    desc: "Traditional wisdom meets modern sustainable practices."
+                                }
+                            ].map((item, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 + i * 0.1 }}
+                                    className="flex flex-col items-start gap-4"
+                                >
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-[#F4D03F] flex items-center justify-center shrink-0 shadow-lg">
+                                        <item.icon className="w-5 h-5 md:w-6 md:h-6 text-black" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h4>
+                                        <p className="text-white/50 text-[10px] md:text-xs leading-relaxed max-w-[200px]">{item.desc}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Shop by Category Section */}
-            < section className="w-full py-12 md:py-20 bg-white" >
+            <section className="w-full py-12 md:py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div className="space-y-4">
@@ -509,59 +652,113 @@ export function HomePage() {
             </section >
 
             {/* Our Products Section - Soft Green */}
-            < section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center" >
-                <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+            <section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center">
+                <div className="container mx-auto px-2 md:px-6 max-w-[1440px]">
                     <div className="space-y-12 md:space-y-16">
                         <motion.div
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{
-                                duration: 0.8,
-                                ease: [0.25, 0.46, 0.45, 0.94]
-                            }}
+                            transition={{ duration: 0.8 }}
                             viewport={{ once: true, amount: 0.3 }}
                             className="space-y-6"
                         >
-                            <div className="flex flex-col items-center gap-4">
+                            <div className="flex flex-col items-center gap-4 relative">
                                 <motion.div
                                     initial={{ width: 0, opacity: 0 }}
                                     whileInView={{ width: 80, opacity: 1 }}
-                                    transition={{ duration: 1, delay: 0.2, ease: [0.33, 1, 0.68, 1] }}
-                                    viewport={{ once: true }}
+                                    transition={{ duration: 1, delay: 0.2 }}
                                     className="h-1 bg-[#2E7D32] rounded-full"
                                 />
                                 <div className="overflow-hidden py-2">
                                     <motion.h2
                                         initial={{ y: "100%" }}
                                         whileInView={{ y: 0 }}
-                                        transition={{ duration: 0.8, delay: 0.3, ease: [0.33, 1, 0.68, 1] }}
-                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.8, delay: 0.3 }}
                                         className="font-serif text-4xl md:text-6xl lg:text-7xl text-[#0F2E1C] tracking-tight"
                                     >
-                                        Our Harvest
+                                        Our Product
                                     </motion.h2>
                                 </div>
                                 <motion.p
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
                                     transition={{ duration: 0.8, delay: 0.5 }}
-                                    viewport={{ once: true }}
                                     className="font-sans text-sm md:text-lg text-[#6D4C41] font-medium max-w-2xl mx-auto italic px-4 leading-relaxed"
                                 >
                                     "Nature's finest seasonal produce, grown with respect for the land and delivered fresh to your table."
                                 </motion.p>
+
+                                {/* Search Bar for Fast Filtering */}
+                                <div className="w-full max-w-md mt-6 relative group">
+                                    <div className="absolute inset-0 bg-[#2E7D32]/5 rounded-2xl blur-xl group-hover:bg-[#2E7D32]/10 transition-all" />
+                                    <div className="relative flex items-center bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#2E7D32]/30 transition-all">
+                                        <div className="pl-4 text-stone-400">
+                                            <Search className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Fast search product..."
+                                            className="flex-1 h-12 bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-400 font-medium pl-3 text-sm"
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                onClick={() => setSearchQuery('')}
+                                                className="p-2 mr-2 text-stone-400 hover:text-stone-600 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Scroll Controls (Desktop) */}
+                                <div className="hidden md:flex absolute right-0 bottom-0 gap-2">
+                                    <button
+                                        onClick={() => scroll('left')}
+                                        className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-[#0F2E1C] hover:text-white transition-all shadow-sm"
+                                    >
+                                        <ChevronLeft className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => scroll('right')}
+                                        className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-[#0F2E1C] hover:text-white transition-all shadow-sm"
+                                    >
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
 
-                        {products.length === 0 ? (
+                        {filteredProducts.length === 0 ? (
                             <div className="py-20 text-stone-400 font-bold font-serif italic text-xl">
-                                The fields are resting. Check back soon for the next harvest.
+                                {searchQuery ? "No matching product found." : "The fields are resting. Check back soon for the next product."}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                                {products.map((product) => (
-                                    <ProductCard key={product.id} product={product} language="en" />
+                            <div
+                                ref={scrollRef}
+                                className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-12 no-scrollbar scroll-smooth px-4 -mx-4 group"
+                            >
+                                {filteredProducts.map((product) => (
+                                    <div key={product.id} className="min-w-[280px] sm:min-w-[340px] flex-shrink-0 snap-start">
+                                        <ProductCard product={product} />
+                                    </div>
                                 ))}
+
+                                {/* View More Card at the end of scroll */}
+                                <motion.div
+                                    className="min-w-[200px] flex-shrink-0 snap-start flex items-center justify-center h-full"
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
+                                >
+                                    <Link
+                                        to="/products"
+                                        className="w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:bg-[#2E7D32] hover:text-white transition-all group/btn"
+                                    >
+                                        <ArrowRight className="w-6 h-6 group-hover/btn:translate-x-1 transition-transform" />
+                                    </Link>
+                                </motion.div>
                             </div>
                         )}
 
@@ -582,10 +779,10 @@ export function HomePage() {
                         </motion.div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* Why Choose Us Section - Warm Beige */}
-            < section className="w-full py-16 md:py-24 bg-[#F5F1E8]" >
+            <section className="w-full py-16 md:py-24 bg-[#F5F1E8]">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -802,145 +999,6 @@ export function HomePage() {
                 </div>
             </section >
 
-            {/* Testimonials Section - Clean & Premium */}
-            < section className="w-full py-20 md:py-28 bg-gradient-to-br from-[#F5F1E8] via-white to-[#E8F0E6]/30 relative overflow-hidden" >
-                {/* Decorative Elements */}
-                < div className="absolute top-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
-
-                <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
-                    <div className="max-w-6xl mx-auto space-y-16">
-                        {/* Header */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8 }}
-                            className="text-center space-y-4"
-                        >
-                            <motion.span
-                                initial={{ opacity: 0, letterSpacing: "0.5em" }}
-                                whileInView={{ opacity: 1, letterSpacing: "0.3em" }}
-                                transition={{ duration: 0.8 }}
-                                className="text-[#F4D03F] text-[10px] font-black uppercase tracking-[0.3em]"
-                            >
-                                ● Customer Stories
-                            </motion.span>
-                            <motion.h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#0F2E1C] leading-tight">
-                                {["What", "our", "customers", "are", "saying"].map((word, i) => (
-                                    <motion.span
-                                        key={i}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.05 * i, duration: 0.4 }}
-                                        className="inline-block mr-2"
-                                    >
-                                        {word}
-                                    </motion.span>
-                                ))}
-                            </motion.h2>
-                        </motion.div>
-
-                        {/* Testimonials Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {[
-                                {
-                                    name: "Abel Tekle",
-                                    role: "Professional Chef",
-                                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
-                                    text: "The deep connection to the land is evident in every vegetable. Green Africa Farm isn't just a supplier; they are guardians of flavor and health.",
-                                    rating: 5
-                                },
-                                {
-                                    name: "Marta Solomon",
-                                    role: "Mother of Three",
-                                    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
-                                    text: "Feeding my children produce that is truly organic and local is my priority. The vibrancy of their harvest is something you have to experience.",
-                                    rating: 5
-                                }
-                            ].map((item, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, y: 40 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 0.2 * i, duration: 0.7 }}
-                                    whileHover={{ y: -8 }}
-                                    className="p-8 md:p-10 rounded-2xl bg-white border border-stone-200/50 shadow-lg hover:shadow-2xl transition-all duration-500"
-                                >
-                                    {/* Quote Icon */}
-                                    <div className="mb-6">
-                                        <svg className="w-12 h-12 text-[#F4D03F]/30" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                                        </svg>
-                                    </div>
-
-                                    {/* Stars */}
-                                    <div className="flex gap-1 mb-6">
-                                        {[...Array(item.rating)].map((_, j) => (
-                                            <motion.span
-                                                key={j}
-                                                initial={{ opacity: 0, scale: 0 }}
-                                                whileInView={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: 0.3 + i * 0.1 + j * 0.05 }}
-                                                className="text-[#F4D03F] text-xl"
-                                            >
-                                                ★
-                                            </motion.span>
-                                        ))}
-                                    </div>
-
-                                    {/* Quote Text */}
-                                    <p className="font-serif text-lg md:text-xl text-[#0F2E1C] leading-relaxed mb-8 italic">
-                                        "{item.text}"
-                                    </p>
-
-                                    {/* Author */}
-                                    <div className="flex items-center gap-4 pt-6 border-t border-stone-200/50">
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-14 h-14 rounded-full object-cover border-2 border-[#F4D03F]/30 shadow-md"
-                                        />
-                                        <div>
-                                            <div className="font-bold text-base text-[#0F2E1C]">{item.name}</div>
-                                            <div className="text-sm text-[#2E7D32] font-medium">{item.role}</div>
-                                        </div>
-                                        <Leaf className="ml-auto h-8 w-8 text-[#2E7D32]/20" />
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Stats Bar */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.4, duration: 0.8 }}
-                            className="grid grid-cols-3 gap-4 md:gap-8 pt-8 md:pt-12 border-t border-stone-200/50"
-                        >
-                            {[
-                                { label: "Happy Customers", value: "2,400+" },
-                                { label: "Organic Certified", value: "100%" },
-                                { label: "Partner Farms", value: "45+" }
-                            ].map((stat, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 200 }}
-                                    className="text-center"
-                                >
-                                    <div className="font-serif text-xl md:text-4xl font-black text-[#0F2E1C] mb-1 md:mb-2">{stat.value}</div>
-                                    <div className="text-[10px] md:text-sm text-[#6D4C41] uppercase tracking-wider font-bold leading-tight">{stat.label}</div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </div>
-                </div>
-            </section >
 
             {/* How It Works Section - Modern Timeline */}
             < section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
@@ -1082,106 +1140,8 @@ export function HomePage() {
                 < div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
 
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
-                    {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center space-y-4 mb-16"
-                    >
-                        <motion.span
-                            initial={{ opacity: 0, letterSpacing: "0.5em" }}
-                            whileInView={{ opacity: 1, letterSpacing: "0.3em" }}
-                            transition={{ duration: 0.8 }}
-                            className="text-[#F4D03F] text-[10px] font-black uppercase tracking-[0.3em]"
-                        >
-                            ● Trusted By
-                        </motion.span>
-                        <motion.h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#0F2E1C] leading-tight">
-                            {["Loved", "by", "families,", "trusted", "by", "chefs"].map((word, i) => (
-                                <motion.span
-                                    key={i}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.05 * i, duration: 0.4 }}
-                                    className="inline-block mr-2"
-                                >
-                                    {word}
-                                </motion.span>
-                            ))}
-                        </motion.h2>
-                    </motion.div>
 
-                    {/* Client Testimonials Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                        {[
-                            {
-                                name: "Sarah Johnson",
-                                role: "Home Chef & Mother",
-                                image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200",
-                                rating: 5,
-                                text: "The quality is unmatched! My family can taste the difference in every meal."
-                            },
-                            {
-                                name: "Chef Marcus Lee",
-                                role: "Restaurant Owner",
-                                image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200",
-                                rating: 5,
-                                text: "Green Africa Farm supplies our restaurant with the freshest organic produce. Our customers love it!"
-                            },
-                            {
-                                name: "Emily Rodriguez",
-                                role: "Wellness Coach",
-                                image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
-                                rating: 5,
-                                text: "Finally, a farm that truly understands organic. I recommend them to all my clients."
-                            }
-                        ].map((client, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1, duration: 0.6 }}
-                                whileHover={{ y: -8 }}
-                                className="p-6 rounded-xl bg-gradient-to-br from-[#F5F1E8] to-white border border-stone-200/50 shadow-sm hover:shadow-xl transition-all duration-300"
-                            >
-                                {/* Stars */}
-                                <div className="flex gap-1 mb-4">
-                                    {[...Array(client.rating)].map((_, j) => (
-                                        <motion.span
-                                            key={j}
-                                            initial={{ opacity: 0, scale: 0 }}
-                                            whileInView={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.3 + i * 0.1 + j * 0.05 }}
-                                            className="text-[#F4D03F] text-lg"
-                                        >
-                                            ★
-                                        </motion.span>
-                                    ))}
-                                </div>
 
-                                {/* Quote */}
-                                <p className="text-sm text-[#6D4C41] leading-relaxed mb-6 italic">
-                                    "{client.text}"
-                                </p>
-
-                                {/* Author */}
-                                <div className="flex items-center gap-3 pt-4 border-t border-stone-200/50">
-                                    <img
-                                        src={client.image}
-                                        alt={client.name}
-                                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
-                                    />
-                                    <div>
-                                        <div className="font-bold text-sm text-[#0F2E1C]">{client.name}</div>
-                                        <div className="text-xs text-[#2E7D32] font-medium">{client.role}</div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
 
                     {/* Trust Metrics */}
                     <motion.div
@@ -1235,6 +1195,160 @@ export function HomePage() {
                             ))}
                         </div>
                     </motion.div>
+                </div>
+            </section >
+
+            {/* Trusted By Section - Infinite Loop */}
+            <section className="w-full py-20 md:py-32 bg-[#FCFAFA] overflow-hidden relative">
+                {/* Vibrant Africa-Inspired Accent Circles */}
+                <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-1/2 -left-32 w-80 h-80 bg-[#C62828]/5 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Ethiopian Messai Decorative Pattern Overlay */}
+                <div className="absolute inset-0 opacity-[0.01] pointer-events-none"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='%236D4C41'/%3E%3C/svg%3E")`, backgroundSize: '40px' }} />
+                <div className="container mx-auto px-4 md:px-6 max-w-7xl mb-12 text-center relative">
+                    <motion.span
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-[#F4D03F] text-[10px] md:text-xs font-black uppercase tracking-[0.5em] mb-4 inline-block"
+                    >
+                        ● Trusted By
+                    </motion.span>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="font-serif text-4xl md:text-6xl text-[#0F2E1C] leading-tight"
+                    >
+                        Loved by <span className="italic text-[#2E7D32]">families</span>, trusted by <span className="italic text-[#6D4C41]">chefs</span>
+                    </motion.h2>
+                </div>
+
+                {/* Primary Testimonial Scroll */}
+                <div className="relative flex overflow-hidden">
+                    <div className="flex animate-scroll whitespace-nowrap gap-6 py-4">
+                        {[
+                            {
+                                name: "Abel Tekle",
+                                role: "Executive Chef, Addis",
+                                text: "The deep connection to the land is evident in every vegetable. Green Africa Farm isn't just a supplier; they are guardians of flavor and health.",
+                                img: "https://images.unsplash.com/photo-1566753323558-f4e0952af115?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Hiwot Solomon",
+                                role: "Mother & Nutritionist",
+                                text: "Feeding my children produce that is truly organic and local is my priority. The vibrancy of their harvest is something you have to experience.",
+                                img: "data:image/jpeg;base64,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"
+                            },
+                            {
+                                name: "Bruke Bekele",
+                                role: "Professional Chef",
+                                text: "As a chef, I value the nutrient density of soil-grown produce. This farm consistently delivers excellence to our community kitchen.",
+                                img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Selamawit T.",
+                                role: "Wellness Advocate",
+                                text: "The integrity of their farming practices is what sets them apart. Clean, honest food delivered right to our doorstep in Addis.",
+                                img: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Dawit Yohannes",
+                                role: "Restaurant Owner",
+                                text: "Supporting local farmers while getting world-class organic produce. It's a win-win for everyone involved in the cycle.",
+                                img: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80&w=400"
+                            }
+                        ].map((t, i) => (
+                            <div key={i} className="flex-shrink-0 w-[300px] md:w-[400px] bg-white p-8 rounded-2xl border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-500 group relative">
+                                <div className="space-y-6">
+                                    {/* Star Rating */}
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-[#F4D03F] text-xs">★</span>)}
+                                    </div>
+
+                                    {/* Testimonial Text */}
+                                    <p className="text-[#6D4C41] italic leading-relaxed text-sm md:text-base whitespace-normal font-medium">
+                                        "{t.text}"
+                                    </p>
+
+                                    {/* Divider */}
+                                    <div className="w-full h-px bg-stone-100" />
+
+                                    {/* Profile */}
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-stone-100">
+                                            <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-[#0F2E1C] text-sm md:text-base">{t.name}</h4>
+                                            <p className="text-[10px] md:text-xs text-[#2E7D32] font-semibold">{t.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {/* Loop Duplicate */}
+                        {[
+                            {
+                                name: "Abel Tekle",
+                                role: "Executive Chef, Addis",
+                                text: "The deep connection to the land is evident in every vegetable. Green Africa Farm isn't just a supplier; they are guardians of flavor and health.",
+                                img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Hiwot Solomon",
+                                role: "Mother & Nutritionist",
+                                text: "Feeding my children produce that is truly organic and local is my priority. The vibrancy of their harvest is something you have to experience.",
+                                img: "https://images.unsplash.com/photo-1531123897727-8f129e16fd3c?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Bruke Bekele",
+                                role: "Professional Chef",
+                                text: "As a chef, I value the nutrient density of soil-grown produce. This farm consistently delivers excellence to our community kitchen.",
+                                img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Selamawit T.",
+                                role: "Wellness Advocate",
+                                text: "The integrity of their farming practices is what sets them apart. Clean, honest food delivered right to our doorstep in Addis.",
+                                img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=400"
+                            },
+                            {
+                                name: "Dawit Yohannes",
+                                role: "Restaurant Owner",
+                                text: "Supporting local farmers while getting world-class organic produce. It's a win-win for everyone involved in the cycle.",
+                                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400"
+                            }
+                        ].map((t, i) => (
+                            <div key={`dup-${i}`} className="flex-shrink-0 w-[300px] md:w-[400px] bg-white p-8 rounded-2xl border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-500 group relative">
+                                <div className="space-y-6">
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-[#F4D03F] text-xs">★</span>)}
+                                    </div>
+
+                                    <p className="text-[#6D4C41] italic leading-relaxed text-sm md:text-base whitespace-normal font-medium">
+                                        "{t.text}"
+                                    </p>
+
+                                    <div className="w-full h-px bg-stone-100" />
+
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-stone-100">
+                                            <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-[#0F2E1C] text-sm md:text-base">{t.name}</h4>
+                                            <p className="text-[10px] md:text-xs text-[#2E7D32] font-semibold">{t.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                    </div>
                 </div>
             </section >
 
@@ -1351,11 +1465,51 @@ export function HomePage() {
                             whileHover={{ scale: 1.1, y: -5 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={scrollToTop}
-                            className="fixed bottom-8 right-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
+                            className="fixed bottom-8 left-8 z-50 p-4 bg-[#0F2E1C] text-white rounded-full shadow-2xl border border-white/20 group hover:bg-[#2E7D32] transition-colors"
                             aria-label="Back to Top"
                         >
                             <ArrowUp className="h-6 w-6 group-hover:animate-bounce" />
                         </motion.button>
+                    )
+                }
+            </AnimatePresence >
+
+            {/* Video Modal */}
+            <AnimatePresence>
+                {
+                    isVideoModalOpen && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-100 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
+                        >
+                            <motion.button
+                                onClick={() => setIsVideoModalOpen(false)}
+                                className="absolute top-6 right-6 p-4 text-white hover:text-[#F4D03F] transition-colors z-110"
+                            >
+                                <X className="w-8 h-8 md:w-10 md:h-10" />
+                            </motion.button>
+
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black relative"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/TCk6LeLZF0M?autoplay=1"
+                                    title="Farm Journey"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                    className="w-full h-full"
+                                ></iframe>
+                            </motion.div>
+                        </motion.div>
                     )
                 }
             </AnimatePresence >

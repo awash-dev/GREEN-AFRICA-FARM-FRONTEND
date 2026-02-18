@@ -27,7 +27,7 @@ export function FullScreenLoader() {
                 transition={{ delay: 0.2 }}
                 className="mt-6 font-serif text-xl font-bold text-[#0F2E1C] tracking-wide"
             >
-                Gathering the Harvest...
+                Green Africa Farm
             </motion.p>
         </motion.div>
     );

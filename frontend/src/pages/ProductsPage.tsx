@@ -2,19 +2,14 @@ import { useEffect, useState } from 'react';
 import { api, Product } from '@/services/api';
 import { ProductCard } from '@/components/ProductCard';
 import { Input } from '@/components/ui/input';
-import { Search, Globe } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { AnimatePresence } from 'framer-motion';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { cn } from '@/lib/utils';
 
 export function ProductsPage() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
@@ -22,45 +17,50 @@ export function ProductsPage() {
     const [language, setLanguage] = useState<'en' | 'am' | 'om'>('en');
 
     useEffect(() => {
-        fetchCategories();
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                const [productsRes, categoriesRes] = await Promise.all([
+                    api.getAllProducts({ limit: 1000 }), // Fetch everything
+                    api.getCategories()
+                ]);
+
+                if (productsRes.success) {
+                    setAllProducts(productsRes.data);
+                    setFilteredProducts(productsRes.data);
+                }
+                if (categoriesRes.success) {
+                    setCategories(['All', ...categoriesRes.data]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch initial data', error);
+                setCategories(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadInitialData();
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchProducts(products.length === 0);
-        }, search || category ? 400 : 0);
-        return () => clearTimeout(timer);
-    }, [search, category]);
+        // Fast client-side filtering including localized fields
+        const filtered = allProducts.filter(product => {
+            const searchLower = search.toLowerCase();
+            const matchesSearch = !search ||
+                product.name.toLowerCase().includes(searchLower) ||
+                product.description?.toLowerCase().includes(searchLower) ||
+                product.description_am?.toLowerCase().includes(searchLower) ||
+                product.description_om?.toLowerCase().includes(searchLower) ||
+                product.category?.toLowerCase().includes(searchLower);
 
-    const fetchCategories = async () => {
-        try {
-            const response = await api.getCategories();
-            if (response.success) {
-                setCategories(['All', ...response.data]);
-            }
-        } catch (error) {
-            console.error('Failed to fetch categories', error);
-            setCategories(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
-        }
-    };
+            const matchesCategory = !category || category === 'All' ||
+                product.category?.toLowerCase() === category.toLowerCase();
 
-    const fetchProducts = async (showFullLoading: boolean) => {
-        if (showFullLoading) setLoading(true);
-        try {
-            const params: any = { limit: 100 };
-            if (search) params.search = search;
-            if (category && category !== 'All') params.category = category.trim();
-
-            const response = await api.getAllProducts(params);
-            if (response.success) {
-                setProducts(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch products', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredProducts(filtered);
+    }, [search, category, allProducts]);
 
     return (
         <div className="min-h-screen bg-[#FAF8F3]">
@@ -68,70 +68,70 @@ export function ProductsPage() {
                 {loading && <FullScreenLoader />}
             </AnimatePresence>
 
-            <div className="space-y-6 md:space-y-12 px-4 md:px-6 max-w-7xl mx-auto py-8 md:py-12">
-                {/* Header & Search Section */}
-                <div className="flex flex-col items-center text-center space-y-5 max-w-3xl mx-auto">
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-center gap-2 text-emerald-600">
-                            <span className="h-px w-4 bg-emerald-600/30"></span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.25em]">Premium Harvest</span>
-                            <span className="h-px w-4 bg-emerald-600/30"></span>
-                        </div>
-                        <h1 className="font-serif text-3xl md:text-5xl text-[#0F2E1C] leading-[0.9]">
-                            Ethiopian Highland <span className="italic text-[#2E7D32]">Harvest</span>
-                        </h1>
-                        <p className="text-[#6D4C41]/60 text-[10px] font-black uppercase tracking-[0.3em] pt-1">
-                            Organic • Quality • Sustainable
-                        </p>
-                    </div>
+            <div className="space-y-6 md:space-y-12 px-2 md:px-6 max-w-[1440px] mx-auto py-8 md:py-12">
 
-                    {/* Floating Search Bar */}
-                    <div className="w-full bg-white p-1.5 rounded-full shadow-lg shadow-[#0F2E1C]/5 border border-stone-100 flex flex-col sm:flex-row items-center gap-1.5 transition-all hover:shadow-xl hover:shadow-[#0F2E1C]/10 hover:-translate-y-0.5 duration-500 max-w-xl mx-auto">
-                        <div className="relative flex-1 w-full text-center sm:text-left">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-stone-50 flex items-center justify-center text-stone-400">
-                                <Search className="h-3.5 w-3.5" />
-                            </div>
+
+                {/* Modern Search & Filter Dashboard */}
+                <div className="w-full space-y-4 pt-2">
+                    {/* Search Input Container - Screenshot Style */}
+                    <div className="relative max-w-2xl mx-auto px-1">
+                        <div className="relative bg-white border border-stone-200 rounded-lg overflow-hidden flex items-center shadow-sm">
                             <Input
-                                placeholder="Search..."
-                                className="h-10 pl-14 border-none bg-transparent text-sm placeholder:text-stone-400 font-bold focus-visible:ring-0"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search..."
+                                className="flex-1 h-11 border-none bg-transparent text-sm focus-visible:ring-0 font-medium placeholder:text-stone-400 pl-4"
                             />
+                            <button className="mr-1.5 w-8 h-8 rounded-full bg-black flex items-center justify-center text-white active:scale-95 transition-transform">
+                                <Search className="h-4 w-4" />
+                            </button>
                         </div>
+                    </div>
 
-                        <div className="hidden sm:block w-px h-6 bg-stone-100"></div>
+                    {/* Category Dashboard - Minimalist Style */}
+                    <div className="space-y-4 pt-2">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            {/* Categories - Shadcn-like Tabs */}
+                            <div className="flex items-center gap-1 overflow-x-auto pb-1 px-1 no-scrollbar w-full md:w-auto">
+                                {categories.map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategory(cat === 'All' ? '' : cat)}
+                                        className={cn(
+                                            "px-4 py-1.5 text-xs font-semibold rounded-md transition-all border",
+                                            (category === cat || (cat === 'All' && !category))
+                                                ? "bg-black text-white border-black"
+                                                : "bg-white text-stone-500 border-stone-200 hover:border-black hover:text-black"
+                                        )}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
 
-                        <div className="flex w-full sm:w-auto gap-1.5 overflow-x-auto pb-1 sm:pb-0 px-1 sm:px-0 scrollbar-hide justify-center sm:justify-start">
-                            <Select value={category || 'All'} onValueChange={(val) => setCategory(val === 'All' ? '' : val)}>
-                                <SelectTrigger className="h-10 w-full sm:w-[120px] border-none bg-stone-50 rounded-full px-4 font-bold text-[#0F2E1C] hover:bg-[#E8F0E6] transition-colors focus:ring-0 text-[10px] uppercase tracking-wider">
-                                    <SelectValue placeholder="Category" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl border-stone-100 shadow-xl p-1 bg-white">
-                                    {categories.map((cat) => (
-                                        <SelectItem key={cat} value={cat} className="rounded-lg font-medium cursor-pointer focus:bg-[#E8F0E6] focus:text-[#0F2E1C]">
-                                            {cat}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-                                <SelectTrigger className="h-10 w-[70px] shrink-0 border-none bg-stone-50 rounded-full font-black text-[#0F2E1C] hover:bg-[#E8F0E6] transition-colors focus:ring-0 text-[10px] pl-3 pr-2 flex items-center justify-center gap-1">
-                                    <Globe className="h-3 w-3 opacity-50" />
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="min-w-[80px] rounded-xl border-stone-100 shadow-xl p-1 bg-white" align="end">
-                                    <SelectItem value="en" className="rounded-lg font-bold text-xs justify-center">EN</SelectItem>
-                                    <SelectItem value="am" className="rounded-lg font-bold text-xs justify-center">አማ</SelectItem>
-                                    <SelectItem value="om" className="rounded-lg font-bold text-xs justify-center">ORM</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            {/* Language Switcher - Minimalist Pills */}
+                            <div className="flex items-center gap-1 p-1 bg-white border border-stone-200 rounded-lg">
+                                {['en', 'am', 'om'].map((lang) => (
+                                    <button
+                                        key={lang}
+                                        onClick={() => setLanguage(lang as any)}
+                                        className={cn(
+                                            "px-3 py-1 rounded-md text-[10px] font-bold transition-all uppercase",
+                                            language === lang
+                                                ? "bg-stone-100 text-black"
+                                                : "text-stone-400 hover:text-stone-600"
+                                        )}
+                                    >
+                                        {lang}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Product Grid */}
-                {products.length === 0 && !loading ? (
+                {filteredProducts.length === 0 && !loading ? (
                     <div className="text-center py-16 md:py-24 border-2 md:border-4 border-dashed border-stone-100 rounded-4xl md:rounded-[3rem] bg-stone-50/30">
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <Search className="h-8 w-8 md:h-10 md:w-10 text-stone-200" />
@@ -140,9 +140,9 @@ export function ProductsPage() {
                         <button onClick={() => { setSearch(''); setCategory(''); }} className="mt-4 text-emerald-600 font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:underline">Clear all filters</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
-                        {products.map((product: Product) => (
-                            <ProductCard key={product.id} product={product} language={language} />
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-4">
+                        {filteredProducts.map((product: Product) => (
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 )}

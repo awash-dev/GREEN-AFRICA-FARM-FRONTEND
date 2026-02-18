@@ -7,6 +7,8 @@ export interface IProduct extends Document {
   description_om?: string;
   price: number;
   stock: number;
+  category?: string;
+  image_base64?: string;
   unit?: string;
   origin?: string;
   created_at: Date;
