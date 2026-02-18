@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Globe } from 'lucide-react';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import {
     Select,
     SelectContent,
@@ -70,62 +71,89 @@ export function ProductsPage() {
 
             <div className="space-y-6 md:space-y-12 px-4 md:px-6 max-w-7xl mx-auto py-8 md:py-12">
                 {/* Header & Search Section */}
-                <div className="flex flex-col items-center text-center space-y-5 max-w-3xl mx-auto">
+                {/* Header Section */}
+                <div className="flex flex-col items-center text-center space-y-4 max-w-3xl mx-auto">
                     <div className="space-y-2">
                         <div className="flex items-center justify-center gap-2 text-emerald-600">
                             <span className="h-px w-4 bg-emerald-600/30"></span>
                             <span className="text-[9px] font-black uppercase tracking-[0.25em]">Premium Harvest</span>
                             <span className="h-px w-4 bg-emerald-600/30"></span>
                         </div>
-                        <h1 className="font-serif text-3xl md:text-5xl text-[#0F2E1C] leading-[0.9]">
+                        <h1 className="font-serif text-3xl md:text-5xl text-[#0F2E1C] leading-none">
                             Ethiopian Highland <span className="italic text-[#2E7D32]">Harvest</span>
                         </h1>
-                        <p className="text-[#6D4C41]/60 text-[10px] font-black uppercase tracking-[0.3em] pt-1">
-                            Organic • Quality • Sustainable
-                        </p>
                     </div>
 
-                    {/* Floating Search Bar */}
-                    <div className="w-full bg-white p-1.5 rounded-full shadow-lg shadow-[#0F2E1C]/5 border border-stone-100 flex flex-col sm:flex-row items-center gap-1.5 transition-all hover:shadow-xl hover:shadow-[#0F2E1C]/10 hover:-translate-y-0.5 duration-500 max-w-xl mx-auto">
-                        <div className="relative flex-1 w-full text-center sm:text-left">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-stone-50 flex items-center justify-center text-stone-400">
-                                <Search className="h-3.5 w-3.5" />
+                    {/* Modern Search Section */}
+                    <div className="w-full space-y-6">
+                        {/* Search Input Container */}
+                        <div className="relative group max-w-2xl mx-auto">
+                            <div className="absolute inset-0 bg-emerald-500/5 blur-2xl rounded-full group-hover:bg-emerald-500/10 transition-colors duration-500" />
+                            <div className="relative bg-white border border-stone-100 rounded-2xl shadow-xl shadow-stone-200/40 p-1 flex items-center gap-2">
+                                <div className="pl-4 pr-1 text-stone-400">
+                                    <Search className="h-5 w-5" />
+                                </div>
+                                <Input
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search fresh produce..."
+                                    className="flex-1 h-12 md:h-14 border-none bg-transparent text-base focus-visible:ring-0 font-medium placeholder:text-stone-300"
+                                />
+                                <div className="hidden md:flex pr-2 items-center gap-2">
+                                    <div className="h-8 w-px bg-stone-100 mx-2" />
+                                    <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
+                                        <SelectTrigger className="w-[80px] h-10 border-none bg-stone-50 rounded-xl font-bold text-xs uppercase tracking-wider text-[#0F2E1C] focus:ring-0">
+                                            <Globe className="h-3 w-3 mr-1 opacity-50" />
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="min-w-[80px] rounded-xl border-stone-100 shadow-xl bg-white" align="end">
+                                            <SelectItem value="en" className="font-bold text-xs">EN</SelectItem>
+                                            <SelectItem value="am" className="font-bold text-xs">አማ</SelectItem>
+                                            <SelectItem value="om" className="font-bold text-xs">ORM</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <Input
-                                placeholder="Search..."
-                                className="h-10 pl-14 border-none bg-transparent text-sm placeholder:text-stone-400 font-bold focus-visible:ring-0"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
                         </div>
 
-                        <div className="hidden sm:block w-px h-6 bg-stone-100"></div>
+                        {/* Language Selection for Mobile */}
+                        <div className="flex md:hidden justify-center items-center gap-3">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Preferred Language</span>
+                            <div className="flex bg-stone-100 p-1 rounded-xl">
+                                {['en', 'am', 'om'].map((lang) => (
+                                    <button
+                                        key={lang}
+                                        onClick={() => setLanguage(lang as any)}
+                                        className={cn(
+                                            "px-4 py-1.5 rounded-lg text-[10px] font-black transition-all uppercase",
+                                            language === lang ? "bg-white text-[#2E7D32] shadow-sm" : "text-stone-400"
+                                        )}
+                                    >
+                                        {lang === 'en' ? 'EN' : lang === 'am' ? 'አማ' : 'ORM'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-                        <div className="flex w-full sm:w-auto gap-1.5 overflow-x-auto pb-1 sm:pb-0 px-1 sm:px-0 scrollbar-hide justify-center sm:justify-start">
-                            <Select value={category || 'All'} onValueChange={(val) => setCategory(val === 'All' ? '' : val)}>
-                                <SelectTrigger className="h-10 w-full sm:w-[120px] border-none bg-stone-50 rounded-full px-4 font-bold text-[#0F2E1C] hover:bg-[#E8F0E6] transition-colors focus:ring-0 text-[10px] uppercase tracking-wider">
-                                    <SelectValue placeholder="Category" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl border-stone-100 shadow-xl p-1 bg-white">
-                                    {categories.map((cat) => (
-                                        <SelectItem key={cat} value={cat} className="rounded-lg font-medium cursor-pointer focus:bg-[#E8F0E6] focus:text-[#0F2E1C]">
-                                            {cat}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-                                <SelectTrigger className="h-10 w-[70px] shrink-0 border-none bg-stone-50 rounded-full font-black text-[#0F2E1C] hover:bg-[#E8F0E6] transition-colors focus:ring-0 text-[10px] pl-3 pr-2 flex items-center justify-center gap-1">
-                                    <Globe className="h-3 w-3 opacity-50" />
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="min-w-[80px] rounded-xl border-stone-100 shadow-xl p-1 bg-white" align="end">
-                                    <SelectItem value="en" className="rounded-lg font-bold text-xs justify-center">EN</SelectItem>
-                                    <SelectItem value="am" className="rounded-lg font-bold text-xs justify-center">አማ</SelectItem>
-                                    <SelectItem value="om" className="rounded-lg font-bold text-xs justify-center">ORM</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        {/* Category Chips - Scrollable for Mobile */}
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 text-center">Filter by Category</p>
+                            <div className="flex items-center gap-2 overflow-x-auto pb-4 px-2 no-scrollbar justify-start md:justify-center">
+                                {categories.map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategory(cat === 'All' ? '' : cat)}
+                                        className={cn(
+                                            "whitespace-nowrap px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 border",
+                                            (category === cat || (cat === 'All' && !category))
+                                                ? "bg-[#0F2E1C] text-white border-[#0F2E1C] shadow-lg shadow-[#0F2E1C]/20 scale-105"
+                                                : "bg-white text-stone-500 border-stone-100 hover:border-emerald-200 hover:text-emerald-700 hover:bg-emerald-50/50"
+                                        )}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

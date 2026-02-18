@@ -48,7 +48,17 @@ export function Footer() {
                     <p className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                         <span>© 2026 Green Ethiopia Farms. All Rights Reserved.</span>
                         <span className="hidden md:inline">•</span>
-                        <span className="text-white/40">Grown in the Highlands</span>
+                        <span className="text-white/40 italic">
+                            Build and powered by{' '}
+                            <a
+                                href="https://portfolios.pro.et"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-400 hover:underline font-bold"
+                            >
+                                awash dev
+                            </a>
+                        </span>
                     </p>
                     <div className="flex items-center gap-4">
                         <Mail className="h-4 w-4" />
