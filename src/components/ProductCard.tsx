@@ -56,7 +56,7 @@ export function ProductCard({ product, language = 'en' }: ProductCardProps) {
                 className="h-full bg-white rounded-xl border border-stone-200/60 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#2E7D32]/20 transition-all duration-500 flex flex-col group touch-manipulation"
             >
                 {/* Image Section */}
-                <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-50">
+                <div className="relative h-40 sm:h-44 w-full overflow-hidden bg-stone-50">
                     <motion.img
                         src={product.image_base64}
                         alt={product.name}
@@ -80,8 +80,8 @@ export function ProductCard({ product, language = 'en' }: ProductCardProps) {
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 flex flex-col p-4 space-y-3">
-                    <div className="space-y-1.5">
+                <div className="flex-1 flex flex-col p-4 space-y-1">
+                    <div className="space-y-1">
                         <p className="text-[8px] font-bold text-[#2E7D32] uppercase tracking-widest">
                             {product.category || "Fresh Harvest"}
                         </p>
