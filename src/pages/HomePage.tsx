@@ -563,9 +563,9 @@ export function HomePage() {
                                 The fields are resting. Check back soon for the next harvest.
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-[10px] md:gap-8">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-4">
                                 {products.map((product) => (
-                                    <ProductCard key={product.id} product={product} language="en" />
+                                    <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
                         )}

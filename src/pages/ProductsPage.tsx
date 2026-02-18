@@ -165,9 +165,9 @@ export function ProductsPage() {
                         <button onClick={() => { setSearch(''); setCategory(''); }} className="mt-4 text-emerald-600 font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:underline">Clear all filters</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-10">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-4">
                         {products.map((product: Product) => (
-                            <ProductCard key={product.id} product={product} language={language} />
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 )}
