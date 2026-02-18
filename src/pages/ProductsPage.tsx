@@ -69,7 +69,7 @@ export function ProductsPage() {
                 {loading && <FullScreenLoader />}
             </AnimatePresence>
 
-            <div className="space-y-6 md:space-y-12 px-4 md:px-6 max-w-7xl mx-auto py-8 md:py-12">
+            <div className="space-y-6 md:space-y-12 px-2 md:px-6 max-w-[1440px] mx-auto py-8 md:py-12">
                 {/* Header & Search Section */}
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center space-y-4 max-w-3xl mx-auto">
@@ -168,7 +168,7 @@ export function ProductsPage() {
                         <button onClick={() => { setSearch(''); setCategory(''); }} className="mt-4 text-emerald-600 font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:underline">Clear all filters</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
                         {products.map((product: Product) => (
                             <ProductCard key={product.id} product={product} language={language} />
                         ))}
