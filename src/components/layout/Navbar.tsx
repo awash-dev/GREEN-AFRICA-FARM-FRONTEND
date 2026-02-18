@@ -34,7 +34,7 @@ export function Navbar() {
 
     const navLinks = [
         { to: "/", label: "Home" },
-        { to: "/products", label: "Harvest" },
+        { to: "/products", label: "Our Products" },
         { to: "/about", label: "Our Story" },
         { to: "/contact", label: "Contact" },
     ];
