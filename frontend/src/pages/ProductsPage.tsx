@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { api, Product } from '@/services/api';
 import { ProductCard } from '@/components/ProductCard';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2, Globe } from 'lucide-react';
+import { Search, Globe } from 'lucide-react';
+import { FullScreenLoader } from '@/components/FullScreenLoader';
+import { AnimatePresence } from 'framer-motion';
 import {
     Select,
     SelectContent,
@@ -62,6 +64,10 @@ export function ProductsPage() {
 
     return (
         <div className="min-h-screen bg-[#FAF8F3]">
+            <AnimatePresence>
+                {loading && <FullScreenLoader />}
+            </AnimatePresence>
+
             <div className="space-y-6 md:space-y-12 px-4 md:px-6 max-w-7xl mx-auto py-8 md:py-12">
                 {/* Header & Search Section */}
                 <div className="flex flex-col items-center text-center space-y-5 max-w-3xl mx-auto">
@@ -72,7 +78,7 @@ export function ProductsPage() {
                             <span className="h-px w-4 bg-emerald-600/30"></span>
                         </div>
                         <h1 className="font-serif text-3xl md:text-5xl text-[#0F2E1C] leading-[0.9]">
-                            Pure African <span className="italic text-[#2E7D32]">Harvest</span>
+                            Ethiopian Highland <span className="italic text-[#2E7D32]">Harvest</span>
                         </h1>
                         <p className="text-[#6D4C41]/60 text-[10px] font-black uppercase tracking-[0.3em] pt-1">
                             Organic • Quality • Sustainable
@@ -125,15 +131,7 @@ export function ProductsPage() {
                 </div>
 
                 {/* Product Grid */}
-                {loading ? (
-                    <div className="min-h-[400px] flex items-center justify-center flex-col gap-6 text-emerald-600">
-                        <div className="relative">
-                            <Loader2 className="h-12 w-12 animate-spin" />
-                            <div className="absolute inset-0 blur-2xl bg-emerald-500/20 animate-pulse" />
-                        </div>
-                        <p className="font-black text-[10px] md:text-xs uppercase tracking-[0.3em] opacity-60">Gathering the Harvest...</p>
-                    </div>
-                ) : products.length === 0 ? (
+                {products.length === 0 && !loading ? (
                     <div className="text-center py-16 md:py-24 border-2 md:border-4 border-dashed border-stone-100 rounded-4xl md:rounded-[3rem] bg-stone-50/30">
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <Search className="h-8 w-8 md:h-10 md:w-10 text-stone-200" />

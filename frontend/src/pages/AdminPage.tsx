@@ -21,6 +21,7 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FullScreenLoader } from '@/components/FullScreenLoader';
 
 type AdminView = 'inventory' | 'manage' | 'team' | 'orders';
 
@@ -326,6 +327,7 @@ export function AdminPage() {
 
     return (
         <div className="h-screen bg-stone-50/50 flex flex-col font-sans overflow-hidden">
+            {loading && <FullScreenLoader />}
             {/* Header - Compact & Responsive */}
             <div className="bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50 flex-shrink-0 shadow-sm/50">
                 <div className="container mx-auto px-4">
@@ -686,9 +688,9 @@ export function AdminPage() {
                                                         value={order.status}
                                                         onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
                                                         className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all cursor-pointer outline-none ${order.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-200' :
-                                                                order.status === 'processing' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                                                    order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                                                        'bg-stone-100 text-stone-500 border-stone-200'
+                                                            order.status === 'processing' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                                                order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                                    'bg-stone-100 text-stone-500 border-stone-200'
                                                             }`}
                                                     >
                                                         <option value="pending">Pending</option>

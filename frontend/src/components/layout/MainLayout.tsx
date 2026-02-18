@@ -8,12 +8,12 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
     const location = useLocation();
-    const isAdmin = location.pathname === '/admin';
+    const isAdmin = location.pathname.startsWith('/admin');
 
     return (
         <div className="min-h-screen flex flex-col font-sans antialiased">
             {!isAdmin && <Navbar />}
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col pt-[90px]">
                 {children}
             </main>
             {!isAdmin && <Footer />}

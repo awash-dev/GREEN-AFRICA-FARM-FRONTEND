@@ -4,6 +4,8 @@ import { useCart } from "@/context/CartContext";
 import { ArrowLeft, CheckCircle2, ChevronRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
+import { FullScreenLoader } from '@/components/FullScreenLoader';
+import { AnimatePresence } from 'framer-motion';
 
 const ETHIOPIAN_REGIONS = [
     "Addis Ababa", "Afar", "Amhara", "Benishangul-Gumuz", "Dire Dawa",
@@ -12,7 +14,7 @@ const ETHIOPIAN_REGIONS = [
 ];
 
 export function CheckoutPage() {
-    const { cart, totalPrice, clearCart } = useCart();
+    const { cart, totalPrice, clearCart, updateQuantity } = useCart();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -58,22 +60,25 @@ export function CheckoutPage() {
     };
 
     if (cart.length === 0) {
-        navigate('/cart');
+        navigate('/products');
         return null;
     }
 
     return (
         <div className="min-h-screen bg-[#FAF8F3] py-20 px-4 md:px-8">
+            <AnimatePresence>
+                {loading && <FullScreenLoader />}
+            </AnimatePresence>
             <div className="container mx-auto max-w-6xl">
                 <div className="flex flex-col lg:flex-row gap-16">
                     {/* Form Section */}
-                    <div className="lg:col-span-12 w-full lg:w-[60%] space-y-10">
+                    <div className="lg:col-span-12 w-full lg:w-[50%] space-y-8">
                         <button
-                            onClick={() => navigate('/cart')}
+                            onClick={() => navigate('/products')}
                             className="flex items-center gap-2 text-[#6D4C41] hover:text-[#2E7D32] font-bold text-xs uppercase tracking-widest transition-colors"
                         >
                             <ArrowLeft className="h-4 w-4" />
-                            Back to Basket
+                            Continue Harvest
                         </button>
 
                         <div className="space-y-2">
@@ -81,9 +86,9 @@ export function CheckoutPage() {
                             <p className="text-[#6D4C41] font-medium italic opacity-70">Where should we bring your fresh bounty?</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-8 bg-[#F5F1E8] p-10 rounded-[2.5rem] border border-stone-200/50">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-2">
+                        <form onSubmit={handleSubmit} className="space-y-6 bg-[#F5F1E8] p-6 rounded-3xl border border-stone-200/50">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-1.5">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-[#0F2E1C]/60 ml-1">Full Name</label>
                                     <input
                                         required
@@ -91,10 +96,10 @@ export function CheckoutPage() {
                                         value={formData.fullName}
                                         onChange={handleInputChange}
                                         placeholder="e.g. Abebe Kebede"
-                                        className="w-full bg-white border-stone-200 rounded-2xl h-14 px-6 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
+                                        className="w-full bg-white border-stone-200 rounded-xl h-12 px-4 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-[#0F2E1C]/60 ml-1">Phone Number</label>
                                     <input
                                         required
@@ -102,12 +107,12 @@ export function CheckoutPage() {
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         placeholder="0911..."
-                                        className="w-full bg-white border-stone-200 rounded-2xl h-14 px-6 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
+                                        className="w-full bg-white border-stone-200 rounded-xl h-12 px-4 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-[#0F2E1C]/60 ml-1">Street Address</label>
                                 <input
                                     required
@@ -115,18 +120,18 @@ export function CheckoutPage() {
                                     value={formData.address}
                                     onChange={handleInputChange}
                                     placeholder="Woreda, House No..."
-                                    className="w-full bg-white border-stone-200 rounded-2xl h-14 px-6 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
+                                    className="w-full bg-white border-stone-200 rounded-xl h-12 px-4 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all"
                                 />
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-[#0F2E1C]/60 ml-1">Region in Ethiopia</label>
                                 <select
                                     required
                                     name="region"
                                     value={formData.region}
                                     onChange={handleInputChange}
-                                    className="w-full bg-white border-stone-200 rounded-2xl h-14 px-6 text-[#0F2E1C] focus:ring-2 focus:ring-[#2E7D32] transition-all appearance-none cursor-pointer"
+                                    className="w-full bg-white border-stone-200 rounded-xl h-12 px-4 text-[#0F2E1C] focus:ring-2 focus:ring-[#2E7D32] transition-all appearance-none cursor-pointer"
                                 >
                                     <option value="">Select your region</option>
                                     {ETHIOPIAN_REGIONS.map(region => (
@@ -135,18 +140,18 @@ export function CheckoutPage() {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-[#0F2E1C]/60 ml-1">Special Harvest Notes</label>
                                 <textarea
                                     name="notes"
                                     value={formData.notes}
                                     onChange={handleInputChange}
                                     placeholder="Any specific delivery instructions?"
-                                    className="w-full bg-white border-stone-200 rounded-3xl p-6 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all h-32 resize-none"
+                                    className="w-full bg-white border-stone-200 rounded-2xl p-4 text-[#0F2E1C] placeholder:text-stone-300 focus:ring-2 focus:ring-[#2E7D32] transition-all h-24 resize-none"
                                 />
                             </div>
 
-                            <div className="pt-6 border-t border-stone-200/50 space-y-4">
+                            <div className="pt-4 border-t border-stone-200/50 space-y-3">
                                 <div className="flex items-center gap-3 text-[#2E7D32]">
                                     <CheckCircle2 className="h-5 w-5" />
                                     <span className="font-bold text-sm">Payment Method: Cash on Delivery</span>
@@ -159,7 +164,7 @@ export function CheckoutPage() {
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-8 bg-[#0F2E1C] text-white font-bold rounded-full hover:bg-[#2E7D32] transition-all shadow-2xl shadow-[#0F2E1C]/10 h-auto uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3"
+                                className="w-full py-6 bg-[#0F2E1C] text-white font-bold rounded-full hover:bg-[#2E7D32] transition-all shadow-xl shadow-[#0F2E1C]/10 h-auto uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3"
                             >
                                 {loading ? "Placing your order..." : "Place Harvest Order"}
                                 {!loading && <ChevronRight className="h-4 w-4" />}
@@ -168,7 +173,7 @@ export function CheckoutPage() {
                     </div>
 
                     {/* Simple summary on side for desktop */}
-                    <div className="hidden lg:block w-[40%] sticky top-32">
+                    <div className="hidden lg:block w-[45%] sticky top-32">
                         <div className="bg-[#0F2E1C] rounded-[3rem] p-10 text-white space-y-10 shadow-2xl">
                             <div className="flex items-center gap-3 text-emerald-400">
                                 <Lock className="h-5 w-5" />
@@ -177,17 +182,31 @@ export function CheckoutPage() {
 
                             <h2 className="font-serif text-3xl">Your Basket</h2>
 
-                            <div className="space-y-6 max-h-[300px] overflow-y-auto pr-4 custom-scrollbar">
+                            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
                                 {cart.map(item => (
-                                    <div key={item.id} className="flex gap-4 items-center">
-                                        <div className="h-16 w-16 rounded-2xl overflow-hidden shrink-0 border border-white/10">
+                                    <div key={item.id} className="flex gap-5 items-center">
+                                        <div className="h-20 w-20 rounded-2xl overflow-hidden shrink-0 border border-white/10">
                                             <img src={item.image_base64} className="h-full w-full object-cover" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-bold text-sm tracking-tight line-clamp-1">{item.name}</div>
-                                            <div className="text-[10px] text-white/60 font-medium">Qty: {item.quantity}</div>
+                                            <div className="font-bold text-base tracking-tight line-clamp-1">{item.name}</div>
+                                            <div className="flex items-center gap-3 mt-2">
+                                                <button
+                                                    onClick={() => updateQuantity(item.id!.toString(), Math.max(1, item.quantity - 1))}
+                                                    className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                                                >
+                                                    <span className="text-sm font-bold">-</span>
+                                                </button>
+                                                <div className="text-xs text-white/80 font-bold w-4 text-center">{item.quantity}</div>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id!.toString(), item.quantity + 1)}
+                                                    className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                                                >
+                                                    <span className="text-sm font-bold">+</span>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="font-serif text-lg font-bold">
+                                        <div className="font-serif text-xl font-bold">
                                             {(item.price * item.quantity).toFixed(0)}
                                         </div>
                                     </div>

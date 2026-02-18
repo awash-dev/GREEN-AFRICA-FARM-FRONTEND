@@ -4,6 +4,7 @@ import { HomePage } from '@/pages/HomePage';
 import { ProductsPage } from '@/pages/ProductsPage';
 import { AdminPage } from '@/pages/AdminPage';
 
+import { ContactPage } from '@/pages/ContactPage';
 import About from '@/pages/About';
 
 import { CartPage } from '@/pages/CartPage';
@@ -20,6 +21,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin" element={<AdminPage />} />
 
             <Route path="/cart" element={<CartPage />} />

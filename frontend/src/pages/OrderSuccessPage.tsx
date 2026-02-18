@@ -45,7 +45,7 @@ export function OrderSuccessPage() {
                     <div className="space-y-4">
                         <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl text-[#0F2E1C]">Harvest Booked!</h1>
                         <p className="text-[#6D4C41] font-medium italic opacity-80 text-lg">
-                            Thank you for supporting sustainable farming. Your freshly harvested bounty will be on its way soon.
+                            Thank you for supporting our local farmers. Your freshly harvested highland bounty will be on its way soon.
                         </p>
                     </div>
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Loader2 } from 'lucide-react';
+import { User } from 'lucide-react';
 import { api, TeamMember } from '../services/api';
+import { FullScreenLoader } from '@/components/FullScreenLoader';
 
 export default function About() {
     const [team, setTeam] = useState<TeamMember[]>([]);
@@ -23,6 +24,10 @@ export default function About() {
         fetchTeam();
     }, []);
 
+    if (loading) {
+        return <FullScreenLoader />;
+    }
+
     return (
         <div className="flex flex-col bg-white overflow-x-hidden min-h-screen pt-4 md:pt-8">
 
@@ -38,17 +43,10 @@ export default function About() {
                         transition={{ duration: 0.8 }}
                         className="relative"
                     >
-                        {loading ? (
-                        <div className="flex items-center justify-center h-full min-h-[300px] border-2 border-dashed border-stone-200 rounded-[2.5rem] bg-stone-50">
-                            <div className="text-center space-y-4">
-                                <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mx-auto" />
-                                <p className="text-stone-500 font-medium">Loading team...</p>
-                            </div>
-                        </div>
-                    ) : team.length > 0 ? (
+                        {team.length > 0 ? (
                             <div className="relative group">
                                 <div className="absolute inset-0 bg-emerald-500/10 rotate-3 rounded-[2.5rem] scale-105 blur-2xl transition-all duration-500 group-hover:rotate-6 group-hover:opacity-70" />
-                                <div className="relative w-full max-w-[450px] aspect-square rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white mx-auto lg:mx-0">
+                                <div className="relative w-full max-w-[450px] aspect-square rounded-4xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white mx-auto lg:mx-0">
                                     {team[0].image_base64 ? (
                                         <img
                                             src={team[0].image_base64}
@@ -93,10 +91,10 @@ export default function About() {
                                 Our Vision
                             </div>
                             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-stone-800 leading-tight">
-                                Cultivating a <span className="text-emerald-600 italic">Greener</span> Future for Africa.
+                                Cultivating a <span className="text-emerald-600 italic">Greener</span> Future for Ethiopia.
                             </h2>
                             <p className="text-base md:text-lg text-stone-600 leading-relaxed">
-                                To pioneer a climate-resilient Africa where organic agriculture restores the land and fuels every community's long-term health and prosperity. We aim to be the continent's leading model for sustainable restoration.
+                                To pioneer a climate-resilient Ethiopia where organic agriculture restores our historical highlands and fuels every community's long-term health and prosperity. We aim to be the nation's leading model for sustainable restoration.
                             </p>
                         </motion.div>
 
@@ -115,7 +113,7 @@ export default function About() {
                                 </div>
                                 <h3 className="font-serif text-2xl md:text-3xl font-bold text-stone-800">Nourish, Educate, Restore.</h3>
                                 <p className="text-stone-600 leading-relaxed text-sm md:text-base">
-                                    To nourish Africa naturally by producing <span className="text-emerald-700 font-bold underline decoration-emerald-200 decoration-4 underline-offset-4">100% chemical-free</span> organic produce and distributing high-value seedlings. We are committed to educating farmers through ancestral wisdom combined with modern ecological restoration.
+                                    To nourish Ethiopia naturally by producing <span className="text-emerald-700 font-bold underline decoration-emerald-200 decoration-4 underline-offset-4">100% chemical-free</span> organic produce. We are committed to educating our farmers through the synergy of ancestral wisdom and modern ecological science.
                                 </p>
                             </div>
                         </motion.div>
@@ -138,9 +136,9 @@ export default function About() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {[
-                            { value: "100% Natural", icon: "🌱", desc: "Producing nutrition without any chemical or synthetic interventions." },
-                            { value: "Eco Verified", icon: "🌍", desc: "Strict adherence to protecting local biodiversity and soil health." },
-                            { value: "Community Focus", icon: "🤝", desc: "Empowering and educating small-holder farmers across Africa." }
+                            { value: "100% Natural", icon: "🌱", desc: "Producing nutrition without any chemical or synthetic interventions, following Ethiopian tradition." },
+                            { value: "Eco Verified", icon: "🌍", desc: "Strict adherence to protecting our local Ethiopian biodiversity and soil health." },
+                            { value: "Community Focus", icon: "🤝", desc: "Empowering and educating small-holder farmers across our Ethiopian regions." }
                         ].map((item, i) => (
                             <motion.div
                                 key={i}

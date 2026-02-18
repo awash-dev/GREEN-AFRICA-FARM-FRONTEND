@@ -1,9 +1,8 @@
 import { Product } from "@/services/api";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
     product: Product;
@@ -11,8 +10,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, language = 'en' }: ProductCardProps) {
-    const { addToCart } = useCart();
-    const [isAdded, setIsAdded] = useState(false);
+    const { addToCart, clearCart } = useCart();
+    const navigate = useNavigate();
 
     const getDescription = () => {
         if (language === 'am') return product.description_am || product.description;
@@ -20,10 +19,10 @@ export function ProductCard({ product, language = 'en' }: ProductCardProps) {
         return product.description;
     };
 
-    const handleAddToCart = () => {
+    const handleBuyNow = () => {
+        clearCart();
         addToCart(product);
-        setIsAdded(true);
-        setTimeout(() => setIsAdded(false), 2500);
+        navigate('/checkout');
     };
 
     return (
@@ -111,45 +110,16 @@ export function ProductCard({ product, language = 'en' }: ProductCardProps) {
                             </div>
                         </div>
 
-                        {/* Add to Cart Button */}
+                        {/* Buy Now Button */}
                         <motion.button
-                            onClick={handleAddToCart}
-                            disabled={isAdded}
+                            onClick={handleBuyNow}
                             whileTap={{ scale: 0.97 }}
-                            className={cn(
-                                "w-full h-10 rounded-lg font-bold uppercase tracking-wider text-[9px] transition-all duration-400 flex items-center justify-center gap-2",
-                                isAdded
-                                    ? "bg-emerald-50 text-[#2E7D32] border border-[#2E7D32]/30"
-                                    : "bg-[#0F2E1C] text-white hover:bg-[#2E7D32] shadow-md hover:shadow-lg"
-                            )}
+                            className="w-full h-10 rounded-lg font-bold uppercase tracking-wider text-[9px] transition-all duration-400 flex items-center justify-center gap-2 bg-[#0F2E1C] text-white hover:bg-[#2E7D32] shadow-md hover:shadow-lg"
                         >
-                            <AnimatePresence mode="wait">
-                                {isAdded ? (
-                                    <motion.div
-                                        key="added"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <ShoppingBag className="h-3.5 w-3.5" />
-                                        <span>Added</span>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="add"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <span>Add to Basket</span>
-                                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            <div className="flex items-center gap-2">
+                                <span>Order Now</span>
+                                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+                            </div>
                         </motion.button>
                     </div>
                 </div>
