@@ -1,13 +1,31 @@
 import axios from "axios";
 
-// Using dynamic base URL for different environments
-const BASE_URL = window.location.hostname === "localhost"
-  ? "http://localhost:3000/api"
-  : "https://green-africa-farm-backend.vercel.app/api";
+// ─── Base URL ─────────────────────────────────────────────────────────────────
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api"
+    : "https://green-africa-farm-backend.vercel.app/api";
 
-const PRODUCTS_URL = `${BASE_URL}/products`;
-const TEAM_URL = `${BASE_URL}/team`;
+// const PRODUCTS_URL = `${BASE_URL}/products`;
+// const TEAM_URL = `${BASE_URL}/team`;
 
+// ─── Axios instance with sane defaults ───────────────────────────────────────
+const client = axios.create({
+  baseURL: BASE_URL,
+  // timeout sec 30 s
+  timeout: 30000,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Normalise every response so callers always get { success, data }
+function normalise(raw: any): { success: boolean; data: any } {
+  if (raw === null || raw === undefined) return { success: false, data: [] };
+  if (raw.success !== undefined) return raw;               // already wrapped
+  if (Array.isArray(raw)) return { success: true, data: raw }; // bare array
+  return { success: true, data: raw };
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 export interface Product {
   id?: string | number;
   name: string;
@@ -45,64 +63,71 @@ export interface TeamMember {
   is_active?: boolean;
 }
 
+// ─── API ──────────────────────────────────────────────────────────────────────
 export const api = {
-  // Products Endpoints
-  getAllProducts: async (params?: any) => {
-    const response = await axios.get(PRODUCTS_URL, { params });
-    return response.data;
+  // ── Products ──────────────────────────────────────────────────────────────
+  getAllProducts: async (params?: Record<string, any>) => {
+    const res = await client.get("/products", { params });
+    return normalise(res.data);
   },
   getProductById: async (id: string | number) => {
-    const response = await axios.get(`${PRODUCTS_URL}/${id}`);
-    return response.data;
+    const res = await client.get(`/products/${id}`);
+    return normalise(res.data);
   },
-  createProduct: async (product: any) => {
-    const response = await axios.post(PRODUCTS_URL, product);
-    return response.data;
+  createProduct: async (product: ProductInput | FormData) => {
+    const isForm = product instanceof FormData;
+    const res = await client.post("/products", product, {
+      headers: isForm ? { "Content-Type": "multipart/form-data" } : {},
+    });
+    return normalise(res.data);
   },
-  updateProduct: async (id: string | number, product: any) => {
-    const response = await axios.put(`${PRODUCTS_URL}/${id}`, product);
-    return response.data;
+  updateProduct: async (id: string | number, product: Partial<ProductInput> | FormData) => {
+    const isForm = product instanceof FormData;
+    const res = await client.put(`/products/${id}`, product, {
+      headers: isForm ? { "Content-Type": "multipart/form-data" } : {},
+    });
+    return normalise(res.data);
   },
   deleteProduct: async (id: string | number) => {
-    const response = await axios.delete(`${PRODUCTS_URL}/${id}`);
-    return response.data;
+    const res = await client.delete(`/products/${id}`);
+    return normalise(res.data);
   },
 
-  // Categories
+  // ── Categories ────────────────────────────────────────────────────────────
   getCategories: async () => {
-    const response = await axios.get(`${PRODUCTS_URL}/categories`);
-    return response.data;
+    const res = await client.get("/products/categories");
+    return normalise(res.data);
   },
 
-  // Team/Founder Endpoints
+  // ── Team ──────────────────────────────────────────────────────────────────
   getTeamMembers: async () => {
-    const response = await axios.get(TEAM_URL);
-    return response.data;
+    const res = await client.get("/team");
+    return normalise(res.data);
   },
   createTeamMember: async (member: Partial<TeamMember>) => {
-    const response = await axios.post(TEAM_URL, member);
-    return response.data;
+    const res = await client.post("/team", member);
+    return normalise(res.data);
   },
   updateTeamMember: async (id: string, member: Partial<TeamMember>) => {
-    const response = await axios.put(`${TEAM_URL}/${id}`, member);
-    return response.data;
+    const res = await client.put(`/team/${id}`, member);
+    return normalise(res.data);
   },
   deleteTeamMember: async (id: string) => {
-    const response = await axios.delete(`${TEAM_URL}/${id}`);
-    return response.data;
+    const res = await client.delete(`/team/${id}`);
+    return normalise(res.data);
   },
 
-  // Orders
+  // ── Orders ────────────────────────────────────────────────────────────────
   createOrder: async (orderData: any) => {
-    const response = await axios.post(`${BASE_URL}/orders`, orderData);
-    return response.data;
+    const res = await client.post("/orders", orderData);
+    return normalise(res.data);
   },
   getAllOrders: async () => {
-    const response = await axios.get(`${BASE_URL}/orders`);
-    return response.data;
+    const res = await client.get("/orders");
+    return normalise(res.data);
   },
   updateOrderStatus: async (id: string, status: string) => {
-    const response = await axios.put(`${BASE_URL}/orders/${id}/status`, { status });
-    return response.data;
-  }
+    const res = await client.put(`/orders/${id}/status`, { status });
+    return normalise(res.data);
+  },
 };

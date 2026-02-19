@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+    Activity,
     Loader2,
     ImagePlus,
     Pencil,
@@ -18,10 +19,13 @@ import {
     PlusCircle,
     ArrowLeft,
     Users,
-    ShoppingBag
+    ShoppingBag,
+    ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type AdminView = 'inventory' | 'manage' | 'team' | 'orders';
 
@@ -55,6 +59,7 @@ export function AdminPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [team, setTeam] = useState<TeamMember[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
+    const [langTab, setLangTab] = useState<'en' | 'am' | 'om'>('en');
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [preview, setPreview] = useState<string | null>(null);
@@ -326,93 +331,93 @@ export function AdminPage() {
     };
 
     return (
-        <div className="h-screen bg-stone-50/50 flex flex-col font-sans overflow-hidden">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="h-screen bg-[#FAF8F3] flex flex-col font-sans overflow-hidden"
+        >
             {loading && <FullScreenLoader />}
-            {/* Header - Compact & Responsive */}
-            <div className="bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50 flex-shrink-0 shadow-sm/50">
+            {/* Simple Clean Header */}
+            <header className="bg-white border-b border-stone-200 sticky top-0 z-50 flex-shrink-0">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-center justify-between py-2 md:h-16 gap-3">
-                        <div className="flex items-center justify-between w-full md:w-auto">
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => navigate('/')}
-                                    className="h-8 w-8 text-stone-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-full"
-                                >
-                                    <ArrowLeft className="h-5 w-5" />
-                                </Button>
-
-                                <div className="h-6 w-px bg-stone-200 hidden sm:block" />
-
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 bg-emerald-100 rounded-lg">
-                                        <Package className="h-4 w-4 text-emerald-700" />
-                                    </div>
-                                    <div className="leading-none">
-                                        <h1 className="font-bold text-stone-900 text-sm md:text-base tracking-tight">Farm Manager</h1>
-                                        <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider">Green Africa Core</p>
-                                    </div>
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate('/')}
+                                className="h-9 w-9 text-stone-400 hover:text-emerald-600 transition-colors"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </Button>
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+                                    <Package className="h-5 w-5 text-white" />
                                 </div>
+                                <h1 className="font-bold text-stone-800 text-base tracking-tight">Farm Admin</h1>
                             </div>
                         </div>
 
-                        {/* View Switcher - Scrollable on mobile */}
-                        <div className="w-full md:w-auto overflow-x-auto no-scrollbar">
-                            <div className="flex gap-1 p-1 bg-stone-100/80 rounded-lg min-w-max mx-auto md:mx-0">
-                                <Button
-                                    variant={activeView === 'inventory' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => { setActiveView('inventory'); setEditingId(null); }}
-                                    className={`rounded-md text-xs font-bold transition-all h-8 px-3 ${activeView === 'inventory' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 hover:bg-emerald-700' : 'text-stone-600 hover:bg-white hover:text-emerald-700'}`}
+                        {/* Navigation Tabs */}
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                    fetchProducts();
+                                    fetchTeam();
+                                    fetchOrders();
+                                    fetchCategories();
+                                }}
+                                className="h-8 w-8 text-stone-400 hover:text-emerald-600 mr-2"
+                            >
+                                <Activity className="h-4 w-4" />
+                            </Button>
+                            {[
+                                { id: 'inventory', label: 'Inventory', icon: LayoutGrid },
+                                { id: 'manage', label: editingId ? 'Edit' : 'Add', icon: PlusCircle },
+                                { id: 'team', label: 'Team', icon: Users },
+                                { id: 'orders', label: 'Orders', icon: ShoppingBag }
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => { setActiveView(tab.id as AdminView); if (tab.id !== 'manage') setEditingId(null); }}
+                                    className={cn(
+                                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
+                                        activeView === tab.id
+                                            ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                                            : "text-stone-500 hover:text-emerald-600 hover:bg-stone-50"
+                                    )}
                                 >
-                                    <LayoutGrid className="h-3.5 w-3.5 mr-1.5" />
-                                    Inventory
-                                </Button>
-                                <Button
-                                    variant={activeView === 'manage' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setActiveView('manage')}
-                                    className={`rounded-md text-xs font-bold transition-all h-8 px-3 ${activeView === 'manage' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 hover:bg-emerald-700' : 'text-stone-600 hover:bg-white hover:text-emerald-700'}`}
-                                >
-                                    {editingId && activeView === 'manage' ? <Pencil className="h-3.5 w-3.5 mr-1.5" /> : <PlusCircle className="h-3.5 w-3.5 mr-1.5" />}
-                                    {editingId && activeView === 'manage' ? 'Edit' : 'Add Product'}
-                                </Button>
-                                <Button
-                                    variant={activeView === 'team' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setActiveView('team')}
-                                    className={`rounded-md text-xs font-bold transition-all h-8 px-3 ${activeView === 'team' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 hover:bg-emerald-700' : 'text-stone-600 hover:bg-white hover:text-emerald-700'}`}
-                                >
-                                    <Users className="h-3.5 w-3.5 mr-1.5" />
-                                    About Team
-                                </Button>
-                                <Button
-                                    variant={activeView === 'orders' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setActiveView('orders')}
-                                    className={`rounded-md text-xs font-bold transition-all h-8 px-3 ${activeView === 'orders' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 hover:bg-emerald-700' : 'text-stone-600 hover:bg-white hover:text-emerald-700'}`}
-                                >
-                                    <ShoppingBag className="h-3.5 w-3.5 mr-1.5" />
-                                    Orders
-                                </Button>
-                            </div>
+                                    <tab.icon className="h-3.5 w-3.5" />
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <main className="flex-1 flex flex-col min-h-0 overflow-hidden bg-stone-50">
-                <div id="inventory-list" className="container mx-auto px-4 py-4 max-w-5xl h-full flex flex-col overflow-y-auto pb-20 scroll-smooth">
-                    {notification && (
-                        <div className={`mb-4 p-3 rounded-lg border flex items-center gap-3 flex-shrink-0 animate-in fade-in slide-in-from-top-2 duration-300 ${notification.type === 'success'
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                            : 'bg-red-50 border-red-200 text-red-800'
-                            }`}>
-                            {notification.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                            <p className="text-xs font-medium">{notification.message}</p>
-                        </div>
-                    )}
+            <main className="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#FAF8F3]">
+                <div id="main-content-wrapper" className="container mx-auto px-4 py-4 md:py-8 max-w-5xl h-full flex flex-col overflow-hidden">
+                    <AnimatePresence mode="wait">
+                        {notification && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className={`mb-6 p-4 rounded-2xl border-2 flex items-center gap-4 flex-shrink-0 shadow-xl backdrop-blur-md ${notification.type === 'success'
+                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800'
+                                    : 'bg-red-500/10 border-red-500/20 text-red-800'
+                                    }`}
+                            >
+                                <div className={cn("p-2 rounded-full", notification.type === 'success' ? "bg-emerald-500 text-white" : "bg-red-500 text-white")}>
+                                    {notification.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                                </div>
+                                <p className="text-sm font-bold tracking-tight">{notification.message}</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {activeView === 'team' ? (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-8">
@@ -505,26 +510,48 @@ export function AdminPage() {
                                             </div>
                                         ) : (
                                             team.map(member => (
-                                                <div key={member.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-stone-50/80 transition-colors group">
-                                                    <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-white shadow-md bg-stone-100 flex-shrink-0">
+                                                <div key={member.id} className="p-5 flex flex-col sm:flex-row items-center gap-5 hover:bg-emerald-500/5 transition-all duration-300 group relative overflow-hidden">
+                                                    <div className="absolute left-0 top-0 w-1 h-full bg-emerald-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+
+                                                    <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-white shadow-xl shadow-stone-200/50 bg-stone-100 flex-shrink-0 group-hover:scale-105 transition-transform duration-500">
                                                         {member.image_base64 ? (
                                                             <img src={member.image_base64} className="w-full h-full object-cover" alt={member.name} />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center bg-stone-200">
-                                                                <Users className="h-6 w-6 text-stone-400" />
+                                                                <Users className="h-8 w-8 text-stone-400" />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="font-bold text-stone-900 text-base">{member.name}</h4>
-                                                        <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mt-0.5">{member.role}</p>
-                                                        {member.bio && <p className="text-xs text-stone-500 mt-1 line-clamp-2">{member.bio}</p>}
+
+                                                    <div className="flex-1 text-center sm:text-left min-w-0">
+                                                        <div className="flex flex-col gap-1">
+                                                            <h4 className="font-black text-stone-900 text-lg leading-tight uppercase tracking-tight">{member.name}</h4>
+                                                            <span className="inline-flex w-fit mx-auto sm:mx-0 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 uppercase tracking-widest leading-none">
+                                                                {member.role}
+                                                            </span>
+                                                        </div>
+                                                        {member.bio && (
+                                                            <p className="text-xs font-medium text-stone-500 mt-2.5 line-clamp-2 italic leading-relaxed">
+                                                                "{member.bio}"
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                    <div className="flex gap-1 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 mt-3 sm:mt-0 border-stone-100">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg" onClick={() => handleEditMember(member)}>
+
+                                                    <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-10 w-10 bg-white text-stone-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl shadow-sm border border-stone-100 active:scale-95 transition-all"
+                                                            onClick={() => handleEditMember(member)}
+                                                        >
                                                             <Pencil className="h-4 w-4" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg" onClick={() => handleDeleteMember(member.id!)}>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-10 w-10 bg-white text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl shadow-sm border border-stone-100 active:scale-95 transition-all"
+                                                            onClick={() => handleDeleteMember(member.id!)}
+                                                        >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </div>
@@ -565,18 +592,20 @@ export function AdminPage() {
                                             </div>
                                         </div>
 
-                                        {/* Basic Info Column - 8 cols on desktop */}
-                                        <div className="md:col-span-8 space-y-4">
-                                            <div className="space-y-1">
-                                                <Label htmlFor="name" className="text-xs font-bold text-stone-500 uppercase">Product Name</Label>
-                                                <Input
-                                                    id="name"
-                                                    value={formData.name}
-                                                    onChange={e => setFormData((prev: any) => ({ ...prev, name: e.target.value }))}
-                                                    placeholder="e.g. Organic Red Onions"
-                                                    required
-                                                    className="h-10 bg-white shadow-sm/50 border-stone-200 focus:border-emerald-500"
-                                                />
+                                        {/* Basic Info Column - Refined for Premium Feel */}
+                                        <div className="md:col-span-8 space-y-5">
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="name" className="text-[10px] font-black text-stone-400 uppercase tracking-widest ml-1">Product Name</Label>
+                                                <div className="relative group">
+                                                    <Input
+                                                        id="name"
+                                                        value={formData.name}
+                                                        onChange={e => setFormData((prev: any) => ({ ...prev, name: e.target.value }))}
+                                                        placeholder="e.g. Organic Red Onions"
+                                                        required
+                                                        className="h-12 bg-white/70 border-stone-200/60 focus:bg-white focus:border-emerald-500 rounded-xl shadow-sm group-hover:border-emerald-200 transition-all font-bold px-4 placeholder:text-stone-300 placeholder:font-medium"
+                                                    />
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
@@ -615,50 +644,99 @@ export function AdminPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-1 pt-2">
-                                                <Label className="text-xs font-bold text-stone-500 uppercase">Descriptions</Label>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    <Textarea
-                                                        placeholder="English Description..."
-                                                        value={formData.description}
-                                                        onChange={e => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
-                                                        className="min-h-[80px] text-sm bg-white shadow-sm/50 border-stone-200 focus:border-emerald-500 resize-y"
-                                                        required
-                                                    />
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <Textarea
-                                                            placeholder="Amharic (Optional)..."
-                                                            value={formData.description_am}
-                                                            onChange={e => setFormData((prev: any) => ({ ...prev, description_am: e.target.value }))}
-                                                            className="min-h-[60px] text-sm bg-white shadow-sm/50 border-stone-200"
-                                                        />
-                                                        <Textarea
-                                                            placeholder="Oromo (Optional)..."
-                                                            value={formData.description_om}
-                                                            onChange={e => setFormData((prev: any) => ({ ...prev, description_om: e.target.value }))}
-                                                            className="min-h-[60px] text-sm bg-white shadow-sm/50 border-stone-200"
-                                                        />
+                                            <div className="space-y-4 pt-2">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-xs font-bold text-stone-500 uppercase">Product Descriptions</Label>
+                                                    <div className="flex gap-1 p-1 bg-stone-100 rounded-lg">
+                                                        {(['en', 'am', 'om'] as const).map((lang) => (
+                                                            <button
+                                                                key={lang}
+                                                                type="button"
+                                                                onClick={() => setLangTab(lang)}
+                                                                className={cn(
+                                                                    "px-3 py-1 rounded-md text-[10px] font-bold transition-all uppercase",
+                                                                    langTab === lang
+                                                                        ? "bg-white text-emerald-700 shadow-sm"
+                                                                        : "text-stone-400 hover:text-stone-600"
+                                                                )}
+                                                            >
+                                                                {lang}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="relative">
+                                                    <AnimatePresence mode="wait">
+                                                        <motion.div
+                                                            key={langTab}
+                                                            initial={{ opacity: 0, x: 10 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            exit={{ opacity: 0, x: -10 }}
+                                                            transition={{ duration: 0.2 }}
+                                                        >
+                                                            {langTab === 'en' && (
+                                                                <Textarea
+                                                                    placeholder="Describe your organic harvest in English..."
+                                                                    value={formData.description}
+                                                                    onChange={e => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
+                                                                    className="min-h-[120px] text-sm bg-white border-stone-200 focus:border-emerald-500 resize-none rounded-xl"
+                                                                    required
+                                                                />
+                                                            )}
+                                                            {langTab === 'am' && (
+                                                                <Textarea
+                                                                    placeholder="የምርት መግለጫ በአማርኛ (አማራጭ)..."
+                                                                    value={formData.description_am}
+                                                                    onChange={e => setFormData((prev: any) => ({ ...prev, description_am: e.target.value }))}
+                                                                    className="min-h-[120px] text-sm bg-white border-stone-200 focus:border-emerald-500 resize-none rounded-xl"
+                                                                />
+                                                            )}
+                                                            {langTab === 'om' && (
+                                                                <Textarea
+                                                                    placeholder="Ibsa oomishaa Afaan Oromootiin (Filannoo)..."
+                                                                    value={formData.description_om}
+                                                                    onChange={e => setFormData((prev: any) => ({ ...prev, description_om: e.target.value }))}
+                                                                    className="min-h-[120px] text-sm bg-white border-stone-200 focus:border-emerald-500 resize-none rounded-xl"
+                                                                />
+                                                            )}
+                                                        </motion.div>
+                                                    </AnimatePresence>
+                                                    {/* Indicator for existing translations */}
+                                                    <div className="flex gap-2 mt-2">
+                                                        {formData.description && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="English added" />}
+                                                        {formData.description_am && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" title="Amharic added" />}
+                                                        {formData.description_om && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Oromo added" />}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="flex gap-3 justify-end pt-6 border-t border-stone-100">
-                                        <Button type="button" variant="outline" onClick={resetForm} className="h-10 px-6 border-stone-200 hover:bg-stone-50">
-                                            Cancel
+                                    {/* Premium Action Bar */}
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-end pt-8 border-t border-stone-100">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={resetForm}
+                                            className="h-12 px-8 text-stone-500 font-bold hover:bg-stone-100 rounded-xl transition-all"
+                                        >
+                                            Discard Changes
                                         </Button>
-                                        <Button type="submit" disabled={loading} className="h-10 px-8 bg-emerald-700 hover:bg-emerald-800 text-white font-bold tracking-wide shadow-md shadow-emerald-200">
-                                            {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                                            {editingId ? 'Save Changes' : 'Create Product'}
+                                        <Button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="h-12 px-12 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-xs shadow-[0_10px_20px_-5px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_25px_-5px_rgba(16,185,129,0.4)] transition-all rounded-xl active:scale-[0.98]"
+                                        >
+                                            {loading && <Loader2 className="h-4 w-4 mr-3 animate-spin" />}
+                                            {editingId ? 'Update Premium Item' : 'Publish to Store'}
                                         </Button>
                                     </div>
                                 </form>
                             </CardContent>
                         </Card>
                     ) : activeView === 'orders' ? (
-                        <div className="space-y-6 pb-20">
+                        <div className="flex-1 overflow-y-auto space-y-6 pb-20 no-scrollbar">
                             <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
                                 <h3 className="font-bold text-stone-800">Customer Orders</h3>
                                 <div className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
@@ -673,68 +751,117 @@ export function AdminPage() {
                                     </div>
                                 ) : (
                                     orders.map(order => (
-                                        <Card key={order._id} className="overflow-hidden border-stone-200 hover:border-emerald-200 transition-colors shadow-sm">
-                                            <div className="bg-stone-50/50 p-4 border-b border-stone-100 flex flex-wrap justify-between items-center gap-4">
+                                        <Card key={order._id} className="overflow-hidden border-stone-200/60 hover:border-emerald-500/30 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 group">
+                                            {/* Order Header - Premium Toolbar */}
+                                            <div className="bg-white p-4 border-b border-stone-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="bg-emerald-600 text-white px-3 py-1 rounded-lg font-mono text-sm font-bold">
-                                                        {order.orderId}
+                                                    <div className="relative">
+                                                        <div className="absolute -inset-1 bg-emerald-500 rounded-lg blur opacity-20"></div>
+                                                        <div className="relative bg-stone-900 text-white px-3 py-1.5 rounded-lg font-mono text-xs font-black tracking-tighter">
+                                                            #{order.orderId.toUpperCase()}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs font-bold text-stone-400 uppercase tracking-widest">
-                                                        {new Date(order.createdAt).toLocaleDateString()}
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Ordered On</span>
+                                                        <div className="text-xs font-bold text-stone-700">
+                                                            {new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    <select
-                                                        value={order.status}
-                                                        onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
-                                                        className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all cursor-pointer outline-none ${order.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-200' :
-                                                            order.status === 'processing' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                                                order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                                                    'bg-stone-100 text-stone-500 border-stone-200'
-                                                            }`}
-                                                    >
-                                                        <option value="pending">Pending</option>
-                                                        <option value="processing">Processing</option>
-                                                        <option value="delivered">Delivered</option>
-                                                        <option value="cancelled">Cancelled</option>
-                                                    </select>
+
+                                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                                    <div className="flex-1 sm:flex-initial relative">
+                                                        <select
+                                                            value={order.status}
+                                                            onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
+                                                            className={cn(
+                                                                "w-full sm:w-auto text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border transition-all cursor-pointer outline-none appearance-none pr-8 shadow-sm",
+                                                                order.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                                                    order.status === 'processing' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                                                        order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                                            'bg-stone-50 text-stone-400 border-stone-200'
+                                                            )}
+                                                        >
+                                                            <option value="pending">Pending</option>
+                                                            <option value="processing">Processing</option>
+                                                            <option value="delivered">Delivered</option>
+                                                            <option value="cancelled">Cancelled</option>
+                                                        </select>
+                                                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 opacity-40 pointer-events-none" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <CardContent className="p-6">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                    <div className="space-y-4">
-                                                        <div className="space-y-1">
-                                                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Customer</p>
-                                                            <p className="font-bold text-stone-900">{order.customer.fullName}</p>
-                                                            <p className="text-sm text-stone-600">{order.customer.phone}</p>
+
+                                            <CardContent className="p-5 sm:p-6 bg-white/50 backdrop-blur-sm">
+                                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                                    {/* Customer & Shipping - 5 cols */}
+                                                    <div className="lg:col-span-5 space-y-6">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <div className="w-1 h-3 bg-emerald-500 rounded-full"></div>
+                                                                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Customer Information</p>
+                                                                </div>
+                                                                <p className="font-black text-stone-900 text-lg leading-tight">{order.customer.fullName}</p>
+                                                                <div className="flex items-center gap-2 text-stone-500">
+                                                                    <div className="p-1 bg-stone-100 rounded">
+                                                                        <Activity className="h-3 w-3" />
+                                                                    </div>
+                                                                    <p className="text-xs font-bold">{order.customer.phone}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <div className="w-1 h-3 bg-stone-300 rounded-full"></div>
+                                                                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Delivery Point</p>
+                                                                </div>
+                                                                <p className="text-xs font-bold text-stone-800 leading-relaxed bg-stone-100/50 p-2.5 rounded-lg border border-stone-200/50">
+                                                                    {order.customer.address}, {order.customer.region}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div className="space-y-1">
-                                                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Delivery Address</p>
-                                                            <p className="text-sm text-stone-800">{order.customer.address}, {order.customer.region}</p>
-                                                        </div>
+
                                                         {order.customer.notes && (
-                                                            <div className="space-y-1">
-                                                                <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Notes</p>
-                                                                <p className="text-xs text-stone-500 italic bg-stone-50 p-3 rounded-xl border border-stone-100">{order.customer.notes}</p>
+                                                            <div className="space-y-2">
+                                                                <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Special Requests</p>
+                                                                <p className="text-xs text-stone-500 italic bg-amber-50/50 p-3 rounded-xl border border-amber-100 font-medium">
+                                                                    "{order.customer.notes}"
+                                                                </p>
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="space-y-4">
-                                                        <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Items</p>
-                                                        <div className="space-y-2 border-t border-stone-100 pt-4">
+
+                                                    {/* Order Items - 7 cols */}
+                                                    <div className="lg:col-span-7 space-y-4">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div className="w-1 h-3 bg-emerald-500 rounded-full"></div>
+                                                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Cart Summary</p>
+                                                        </div>
+
+                                                        <div className="space-y-2 bg-white rounded-2xl border border-stone-100 p-2 shadow-sm">
                                                             {order.items.map((item, idx) => (
-                                                                <div key={idx} className="flex justify-between items-center text-sm">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="bg-stone-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-stone-500">{item.quantity}x</span>
-                                                                        <span className="font-medium text-stone-700">{item.name}</span>
+                                                                <div key={idx} className="flex justify-between items-center p-3 rounded-xl hover:bg-stone-50 transition-colors">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700 font-black text-xs border border-emerald-100">
+                                                                            {item.quantity}x
+                                                                        </div>
+                                                                        <span className="font-bold text-stone-800 text-sm">{item.name}</span>
                                                                     </div>
-                                                                    <span className="font-mono text-stone-400">{(item.price * item.quantity).toLocaleString()}</span>
+                                                                    <div className="text-right">
+                                                                        <span className="font-black text-stone-900 text-sm">{(item.price * item.quantity).toLocaleString()}</span>
+                                                                        <span className="text-[9px] font-bold text-stone-400 ml-1">ETB</span>
+                                                                    </div>
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                        <div className="flex justify-between items-center pt-4 border-t border-stone-100">
-                                                            <span className="font-bold text-stone-900 uppercase tracking-widest text-xs">Total</span>
-                                                            <span className="font-black text-emerald-700 text-lg">{order.total.toLocaleString()} ETB</span>
+
+                                                        <div className="flex justify-between items-center p-4 bg-emerald-600 rounded-2xl shadow-lg shadow-emerald-200">
+                                                            <span className="font-black text-white/70 uppercase tracking-widest text-xs">Final Amount</span>
+                                                            <div className="text-right">
+                                                                <span className="font-black text-white text-xl md:text-2xl">{order.total.toLocaleString()}</span>
+                                                                <span className="text-xs font-bold text-white/70 ml-1">ETB</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -746,25 +873,20 @@ export function AdminPage() {
                         </div>
                     ) : (
                         <div className="space-y-4 flex flex-col h-full overflow-hidden">
-                            {/* Search & Stats */}
-                            <div className="flex flex-col sm:flex-row gap-3 items-center flex-shrink-0 bg-white p-3 rounded-xl border border-stone-200 shadow-sm">
+                            {/* Simple Search */}
+                            <div className="bg-white p-3 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-center gap-3">
                                 <div className="relative flex-1 w-full">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                                     <Input
-                                        placeholder="Search by name, category..."
-                                        className="pl-9 h-10 bg-stone-50 border-transparent focus:bg-white focus:border-emerald-500 transition-all font-medium text-sm"
+                                        placeholder="Search products..."
+                                        className="pl-9 h-10 border-stone-200 bg-stone-50 focus:bg-white transition-all rounded-lg"
                                         value={searchQuery}
                                         onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                                     />
                                 </div>
-                                <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-                                    <div className="px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center gap-2 whitespace-nowrap">
-                                        <Package className="h-4 w-4 text-emerald-600" />
-                                        <span className="text-xs font-bold text-emerald-800">{products.length} Items</span>
-                                    </div>
-                                    <div className="px-3 py-2 bg-stone-50 rounded-lg border border-stone-100 flex items-center gap-2 whitespace-nowrap">
-                                        <LayoutGrid className="h-4 w-4 text-stone-500" />
-                                        <span className="text-xs font-bold text-stone-600">{totalPages} Pages</span>
+                                <div className="flex gap-2">
+                                    <div className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100 text-xs font-bold whitespace-nowrap">
+                                        {products.length} Products
                                     </div>
                                 </div>
                             </div>
@@ -794,78 +916,92 @@ export function AdminPage() {
                                     ) : (
                                         <div className="divide-y divide-gray-100">
                                             {paginatedProducts.map(product => (
-                                                <div key={product.id} className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 hover:bg-white hover:shadow-md transition-all duration-200 group border-l-4 border-transparent hover:border-emerald-500">
-                                                    <div className="flex items-center gap-3 w-full sm:w-auto">
-                                                        <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg overflow-hidden border border-stone-200 bg-white flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                <div key={product.id} className="p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 hover:bg-white/80 transition-all duration-300 group border-b border-stone-100/60 last:border-0 relative">
+                                                    <div className="flex items-center gap-4 w-full">
+                                                        {/* Product Image */}
+                                                        <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl overflow-hidden border-2 border-stone-100 bg-white flex-shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.05)] group-hover:shadow-emerald-100 group-hover:border-emerald-100 transition-all duration-300">
                                                             {product.image_base64 ? (
-                                                                <img src={product.image_base64} className="w-full h-full object-cover" alt={product.name} />
+                                                                <img src={product.image_base64} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center bg-stone-50">
-                                                                    <ImagePlus className="h-6 w-6 text-stone-300" />
+                                                                    <Package className="h-8 w-8 text-stone-200" />
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="flex-1 min-w-0 sm:hidden">
-                                                            <div className="flex justify-between items-start">
-                                                                <h4 className="font-bold text-stone-800 truncate text-base">{product.name}</h4>
-                                                            </div>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                                <span className="text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-500 border border-stone-200">
-                                                                    {product.category}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
-                                                    <div className="flex-1 min-w-0 w-full pl-0 sm:pl-2">
-                                                        <div className="hidden sm:block">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <h4 className="font-bold text-stone-800 truncate text-base group-hover:text-emerald-800 transition-colors">{product.name}</h4>
-                                                                <span className="text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-500 border border-stone-200 group-hover:border-emerald-200 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition-colors">
+                                                        {/* Info */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                                                <h4 className="font-black text-stone-800 text-lg md:text-xl truncate group-hover:text-emerald-700 transition-colors leading-tight">
+                                                                    {product.name}
+                                                                </h4>
+                                                                <span className="inline-flex w-fit text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm">
                                                                     {product.category}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-xs text-stone-500 truncate mt-0.5 pr-4">
-                                                                {product.description || <span className="text-stone-300 italic">No description provided</span>}
+                                                            <p className="text-xs font-bold text-stone-400 mt-1.5 line-clamp-1 md:line-clamp-2 md:pr-10 leading-relaxed">
+                                                                {product.description || <span className="italic opacity-50 font-normal">No description provided</span>}
                                                             </p>
-                                                        </div>
 
-                                                        <div className="sm:hidden mt-2 pt-2 border-t border-dashed border-stone-100 flex items-center justify-between w-full">
-                                                            <p className="font-black text-stone-900 text-base">{product.price.toLocaleString()} <span className="text-[10px] font-bold text-stone-400">ETB</span></p>
-                                                            <div className="flex gap-1">
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-emerald-50 hover:text-emerald-600" onClick={() => handleEdit(product)}>
-                                                                    <Pencil className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600" onClick={() => handleDelete(product.id!)}>
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
+                                                            <div className="flex items-center justify-between mt-3 sm:mt-4">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Premium Price</span>
+                                                                    <p className="font-black text-stone-900 text-xl md:text-2xl mt-0.5">
+                                                                        {product.price.toLocaleString()}
+                                                                        <span className="text-xs font-bold text-emerald-600 ml-1">ETB</span>
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Desktop Actions */}
+                                                                <div className="hidden sm:flex items-center gap-2">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-10 w-10 rounded-xl bg-stone-50 text-stone-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                                                                        onClick={() => handleEdit(product)}
+                                                                    >
+                                                                        <Pencil className="h-4.5 w-4.5" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-10 w-10 rounded-xl bg-stone-50 text-stone-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                                                                        onClick={() => handleDelete(product.id!)}
+                                                                    >
+                                                                        <Trash2 className="h-4.5 w-4.5" />
+                                                                    </Button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div className="hidden sm:flex items-center gap-6 pl-4 border-l border-stone-100 h-10">
-                                                        <div className="text-right min-w-[80px]">
-                                                            <p className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Price</p>
-                                                            <p className="font-black text-stone-900 text-base">{product.price.toLocaleString()} <span className="text-[10px] text-stone-400">ETB</span></p>
-                                                        </div>
-                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 hover:scale-105 transition-all" onClick={() => handleEdit(product)}>
-                                                                <Pencil className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-red-50 hover:text-red-600 hover:scale-105 transition-all" onClick={() => handleDelete(product.id!)}>
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
+                                                    {/* Mobile Only Floating Actions */}
+                                                    <div className="sm:hidden absolute top-4 right-4 flex gap-1.5">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-9 w-9 rounded-full bg-white/90 backdrop-blur-md shadow-lg border border-stone-100 text-emerald-600 active:scale-95"
+                                                            onClick={() => handleEdit(product)}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-9 w-9 rounded-full bg-white/90 backdrop-blur-md shadow-lg border border-stone-100 text-red-600 active:scale-95"
+                                                            onClick={() => handleDelete(product.id!)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
+                                            ))}                                        </div>
                                     )}
                                 </CardContent>
                                 {/* Pagination Controls */}
-                                <div className="p-3 bg-white border-t border-stone-200 flex items-center justify-between rounded-b-xl">
-                                    <p className="text-xs font-medium text-stone-500">
-                                        Page <span className="text-stone-900 font-bold">{currentPage}</span> of <span className="text-stone-900 font-bold">{Math.max(1, totalPages)}</span>
+                                <div className="p-4 bg-stone-50/50 border-t border-stone-200 flex items-center justify-between rounded-b-2xl">
+                                    <p className="text-xs font-black text-stone-400 uppercase tracking-widest">
+                                        Page <span className="text-stone-900">{currentPage}</span> / <span className="text-stone-900">{Math.max(1, totalPages)}</span>
                                     </p>
                                     <div className="flex gap-2">
                                         <Button
@@ -873,7 +1009,7 @@ export function AdminPage() {
                                             size="sm"
                                             onClick={() => handlePageChange(currentPage - 1)}
                                             disabled={currentPage === 1}
-                                            className="h-8 text-xs font-bold"
+                                            className="h-9 px-4 rounded-xl border-stone-200 text-xs font-bold hover:bg-white hover:text-emerald-700 transition-all"
                                         >
                                             Previous
                                         </Button>
@@ -882,7 +1018,7 @@ export function AdminPage() {
                                             size="sm"
                                             onClick={() => handlePageChange(currentPage + 1)}
                                             disabled={currentPage === totalPages || totalPages === 0}
-                                            className="h-8 text-xs font-bold"
+                                            className="h-9 px-4 rounded-xl border-stone-200 text-xs font-bold hover:bg-white hover:text-emerald-700 transition-all"
                                         >
                                             Next
                                         </Button>
@@ -893,6 +1029,6 @@ export function AdminPage() {
                     )}
                 </div>
             </main>
-        </div>
+        </motion.div>
     );
 }

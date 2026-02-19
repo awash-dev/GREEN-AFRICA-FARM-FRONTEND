@@ -1,0 +1,25 @@
+{
+    "name": "Green Africa Farm",
+    "short_name": "GreenAfrica",
+    "description": "Premium organic vegetables, fruits, spices and coffee from Ethiopia's fertile highlands. 100% chemical-free, sustainably grown produce.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FAF8F3",
+    "theme_color": "#2E7D32",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "categories": [
+        "food",
+        "shopping",
+        "agriculture"
+    ],
+    "icons": [
+        {
+            "src": "/logo.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg",
+            "purpose": "any maskable"
+        }
+    ]
+}

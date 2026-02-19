@@ -34,10 +34,17 @@ export function Navbar() {
 
     const navLinks = [
         { to: "/", label: "Home" },
-        { to: "/products", label: "Harvest" },
+        { to: "/products", label: "Our Products" },
         { to: "/about", label: "Our Story" },
         { to: "/contact", label: "Contact" },
     ];
+
+    const handleLinkClick = (to: string) => {
+        if (location.pathname === to) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        setIsMenuOpen(false);
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 w-full">
@@ -57,8 +64,11 @@ export function Navbar() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="z-50 shrink-0 scale-75 md:scale-90 origin-left"
+                        onClick={() => handleLinkClick('/')}
                     >
-                        <Logo variant="dark" />
+                        <Link to="/">
+                            <Logo variant="dark" />
+                        </Link>
                     </motion.div>
 
                     {/* Desktop Navigation Links */}
@@ -69,6 +79,7 @@ export function Navbar() {
                                 <Link
                                     key={link.to}
                                     to={link.to}
+                                    onClick={() => handleLinkClick(link.to)}
                                     className={cn(
                                         "text-sm font-bold uppercase tracking-[0.2em] transition-all relative group py-2",
                                         isActive ? "text-[#0F2E1C]" : "text-[#0F2E1C]/60 hover:text-[#2E7D32]"
@@ -155,6 +166,7 @@ export function Navbar() {
                                     >
                                         <Link
                                             to={link.to}
+                                            onClick={() => handleLinkClick(link.to)}
                                             className={cn(
                                                 "text-4xl font-serif font-medium transition-all block py-2",
                                                 location.pathname === link.to ? "text-[#2E7D32]" : "text-[#0F2E1C]"
@@ -164,9 +176,6 @@ export function Navbar() {
                                         </Link>
                                     </motion.div>
                                 ))}
-
-
-
                             </div>
 
                             <div className="mt-auto pb-8 text-center relative z-10">

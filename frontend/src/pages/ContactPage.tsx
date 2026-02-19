@@ -1,7 +1,14 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 
 export function ContactPage() {
+    useEffect(() => {
+        document.title = 'Contact Us | Green Africa Farm – Phone, Email & Location';
+        const meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute('content', 'Contact Green Africa Farm in Addis Ababa, Ethiopia. Call us at 0928704040, email info@greenafricafarms.com, or visit our farm by appointment.');
+    }, []);
+
     return (
         <div className="min-h-screen bg-[#FAF8F3] py-12 px-4 md:px-6">
             <div className="max-w-4xl mx-auto space-y-12">

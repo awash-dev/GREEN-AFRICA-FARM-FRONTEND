@@ -9,6 +9,12 @@ export default function About() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        document.title = 'About Us | Green Africa Farm – Our Story, Mission & Vision';
+        const meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute('content', 'Learn about Green Africa Farm — our mission to nourish Ethiopia with 100% organic produce, our vision for sustainable agriculture, and the team behind it all.');
+    }, []);
+
+    useEffect(() => {
         const fetchTeam = async () => {
             try {
                 const res = await api.getTeamMembers();

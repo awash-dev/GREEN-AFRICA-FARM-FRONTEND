@@ -3,6 +3,7 @@ import { Footer } from './Footer';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -15,7 +16,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     return (
         <div className="min-h-screen flex flex-col font-sans antialiased">
             {!isAdmin && <Navbar />}
-            <main className="flex-1 flex flex-col pt-[90px]">
+            <main className={cn("flex-1 flex flex-col", !isAdmin && "pt-[90px]")}>
                 {children}
             </main>
             {!isAdmin && (
