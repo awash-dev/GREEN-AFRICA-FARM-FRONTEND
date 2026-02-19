@@ -49,14 +49,14 @@ export function Footer() {
                         <span>© 2026 Green Africa Farm. All Rights Reserved.</span>
                         <span className="hidden md:inline">•</span>
                         <span className="text-white/40 italic">
-                            Build and powered by{' '}
+
                             <a
-                                href="https://portfolios.pro.et"
+                                href="http://risetechet.com/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-emerald-400 hover:underline font-bold"
                             >
-                                awash dev
+                                RiseTech ET
                             </a>
                         </span>
                     </p>

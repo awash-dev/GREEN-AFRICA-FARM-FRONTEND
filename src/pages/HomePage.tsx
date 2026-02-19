@@ -1,48 +1,172 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp, Play, Settings, Activity, Fingerprint, X, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Leaf, ShieldCheck, Zap, Globe, Heart, ArrowRight, ArrowUp, Play, Settings, Activity, Fingerprint, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api, Product } from '@/services/api';
 import { FullScreenLoader } from '@/components/FullScreenLoader';
 import { ProductCard } from '@/components/ProductCard';
 
+// SEO helper — dynamically updates title and description
+function usePageSEO(title: string, description: string) {
+    useEffect(() => {
+        document.title = title;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', description);
+    }, [title, description]);
+}
+
 export function HomePage() {
+    usePageSEO(
+        'Green Africa Farm | Premium Organic Produce from Ethiopia – Fresh Vegetables, Fruits & Spices',
+        'Green Africa Farm delivers premium organic vegetables, fruits, spices & coffee from Ethiopia\'s fertile highlands. 100% chemical-free, sustainably grown produce. Shop fresh farm-to-table products online.'
+    );
     const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery] = useState('');
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [slowConnection, setSlowConnection] = useState(false);
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll();
     const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
     const barOpacity = useTransform(scrollYProgress, [0, 0.05], [0, 1]);
+
+    const [productIndex, setProductIndex] = useState(0);
+    const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Infinite loop: clone products [end...] [real] [...start]
+    const CARD_W = typeof window !== 'undefined' && window.innerWidth < 640 ? 304 : 372;
+    const clonedProducts = filteredProducts.length > 0
+        ? [...filteredProducts, ...filteredProducts, ...filteredProducts]
+        : [];
+    // cloneOffset = filteredProducts.length (used implicitly via extIndex start)
+    const [extIndex, setExtIndex] = useState(filteredProducts.length); // start in middle clone
+
+    // Keep extIndex synced when filteredProducts changes
+    useEffect(() => {
+        setExtIndex(filteredProducts.length);
+        setProductIndex(0);
+    }, [filteredProducts.length]);
 
     const heroY = useTransform(scrollYProgress, [0, 0.4], [0, 120]);
     const heroScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.15]);
 
     useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                const [productsRes, categoriesRes] = await Promise.all([
-                    api.getAllProducts({ limit: 12 }),
-                    api.getCategories()
-                ]);
+        if (!isAutoPlaying || filteredProducts.length <= 1) return;
+        const interval = setInterval(() => {
+            goNext();
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [filteredProducts.length, isAutoPlaying, extIndex]);
 
-                if (productsRes.success) {
-                    setAllProducts(productsRes.data);
-                    setFilteredProducts(productsRes.data);
-                }
-                if (categoriesRes.success) setCategories(categoriesRes.data);
-            } catch (error) {
-                console.error('Failed to fetch data', error);
-            } finally {
-                setLoading(false);
+    const goNext = () => {
+        if (isTransitioning) return;
+        setExtIndex((prev) => prev + 1);
+    };
+
+    const goPrev = () => {
+        if (isTransitioning) return;
+        setExtIndex((prev) => prev - 1);
+    };
+
+    // After animation ends, silent-jump if we're in cloned zone
+    const handleAnimationComplete = () => {
+        if (filteredProducts.length === 0) return;
+        if (extIndex >= filteredProducts.length * 2) {
+            // jumped into right clone -> silently jump back to real zone
+            setIsTransitioning(true);
+            setExtIndex(extIndex - filteredProducts.length);
+            setTimeout(() => setIsTransitioning(false), 50);
+        } else if (extIndex < filteredProducts.length) {
+            // jumped into left clone -> silently jump forward to real zone
+            setIsTransitioning(true);
+            setExtIndex(extIndex + filteredProducts.length);
+            setTimeout(() => setIsTransitioning(false), 50);
+        }
+        // Update the dot index
+        const realIdx = extIndex % filteredProducts.length;
+        setProductIndex(realIdx < 0 ? filteredProducts.length + realIdx : realIdx);
+    };
+
+    const nextSlide = () => {
+        setIsAutoPlaying(false);
+        goNext();
+    };
+
+    const prevSlide = () => {
+        setIsAutoPlaying(false);
+        goPrev();
+    };
+
+    // Touch support for mobile swipe
+    const touchStartX = useRef<number>(0);
+    const touchStartY = useRef<number>(0);
+    const autoPlayTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        setIsAutoPlaying(false);
+        // Cancel any pending resume timer
+        if (autoPlayTimer.current) clearTimeout(autoPlayTimer.current);
+    };
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+        const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+        // Only trigger swipe if horizontal movement dominates
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+            if (deltaX < 0) goNext();
+            else goPrev();
+        }
+        // Resume auto-play after 3 seconds
+        autoPlayTimer.current = setTimeout(() => {
+            setIsAutoPlaying(true);
+        }, 3000);
+    };
+
+    const fetchInitialData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        setSlowConnection(false);
+
+        const slowTimer = setTimeout(() => {
+            setSlowConnection(true);
+        }, 6000);
+
+        try {
+            const [productsRes, categoriesRes] = await Promise.all([
+                api.getAllProducts({ limit: 12 }),
+                api.getCategories()
+            ]);
+
+            clearTimeout(slowTimer);
+
+            if (productsRes.success) {
+                setAllProducts(productsRes.data);
+                setFilteredProducts(productsRes.data);
             }
-        };
+            if (categoriesRes.success) setCategories(categoriesRes.data);
+        } catch (err: any) {
+            clearTimeout(slowTimer);
+            console.error('Failed to fetch data', err);
 
+            const isNetworkError = !err.response || err.code === 'ECONNABORTED' || err.message === 'Network Error';
+            if (isNetworkError) {
+                setError('Your connection is poor. Please check your internet.');
+            } else {
+                setError('Failed to load products. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+            setSlowConnection(false);
+        }
+    }, []);
+
+    useEffect(() => {
         fetchInitialData();
 
         const handleScroll = () => {
@@ -78,19 +202,12 @@ export function HomePage() {
         });
     };
 
-    const scroll = (direction: 'left' | 'right') => {
-        if (scrollRef.current) {
-            const { scrollLeft, clientWidth } = scrollRef.current;
-            const scrollAmount = clientWidth * 0.8;
-            const scrollTo = direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
-            scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-        }
-    };
+
 
     return (
         <div className="flex flex-col bg-[#FAF8F3] overflow-x-hidden">
             <AnimatePresence>
-                {loading && <FullScreenLoader key="loader" />}
+                {loading && <FullScreenLoader key="loader" slow={slowConnection} />}
             </AnimatePresence>
             {/* Scroll Progress Bar (Premium Mobile Detail) */}
             <motion.div
@@ -295,7 +412,7 @@ export function HomePage() {
             </section >
 
             {/* Features/USP Bar - Warm Beige */}
-            <section className="relative w-full py-10 md:py-16 bg-[#F5F1E8] z-20">
+            <section className="relative w-full py-8 md:py-12 bg-[#F5F1E8] z-20">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
@@ -338,7 +455,7 @@ export function HomePage() {
             </section >
 
             {/* About Our Farm Section - White */}
-            <section className="w-full py-12 md:py-24 bg-white overflow-hidden" >
+            <section className="w-full py-10 md:py-16 bg-white overflow-hidden" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                         {/* Images */}
@@ -591,9 +708,9 @@ export function HomePage() {
             </section>
 
             {/* Shop by Category Section */}
-            <section className="w-full py-12 md:py-20 bg-white">
+            <section className="w-full py-10 md:py-16 bg-white">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                         <div className="space-y-4">
                             <motion.span
                                 initial={{ opacity: 0, x: -20 }}
@@ -651,10 +768,9 @@ export function HomePage() {
                 </div>
             </section >
 
-            {/* Our Products Section - Soft Green */}
-            <section className="w-full py-12 md:py-24 bg-[#E8F0E6]/40 text-center">
+            <section className="w-full py-12 md:py-20 bg-[#E8F0E6]/40 text-center">
                 <div className="container mx-auto px-2 md:px-6 max-w-[1440px]">
-                    <div className="space-y-12 md:space-y-16">
+                    <div className="space-y-10 md:space-y-12">
                         <motion.div
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -688,79 +804,132 @@ export function HomePage() {
                                     "Nature's finest seasonal produce, grown with respect for the land and delivered fresh to your table."
                                 </motion.p>
 
-                                {/* Search Bar for Fast Filtering */}
-                                <div className="w-full max-w-md mt-6 relative group">
-                                    <div className="absolute inset-0 bg-[#2E7D32]/5 rounded-2xl blur-xl group-hover:bg-[#2E7D32]/10 transition-all" />
-                                    <div className="relative flex items-center bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#2E7D32]/30 transition-all">
-                                        <div className="pl-4 text-stone-400">
-                                            <Search className="w-4 h-4" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            placeholder="Fast search product..."
-                                            className="flex-1 h-12 bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-400 font-medium pl-3 text-sm"
-                                        />
-                                        {searchQuery && (
-                                            <button
-                                                onClick={() => setSearchQuery('')}
-                                                className="p-2 mr-2 text-stone-400 hover:text-stone-600 transition-colors"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Scroll Controls (Desktop) */}
-                                <div className="hidden md:flex absolute right-0 bottom-0 gap-2">
-                                    <button
-                                        onClick={() => scroll('left')}
-                                        className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-[#0F2E1C] hover:text-white transition-all shadow-sm"
-                                    >
-                                        <ChevronLeft className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        onClick={() => scroll('right')}
-                                        className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-[#0F2E1C] hover:text-white transition-all shadow-sm"
-                                    >
-                                        <ChevronRight className="w-5 h-5" />
-                                    </button>
-                                </div>
+                                {/* Search Bar for Fast Filtering - Removed per user request */}
                             </div>
                         </motion.div>
 
-                        {filteredProducts.length === 0 ? (
+                        {/* ── Error Banner ── */}
+                        <AnimatePresence>
+                            {error && !loading && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="max-w-2xl mx-auto flex items-center justify-between bg-red-50 border border-red-200 rounded-2xl px-6 py-4 text-sm text-red-700 mb-8 shadow-sm"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                                            <X className="w-4 h-4" />
+                                        </div>
+                                        <span className="font-medium">{error}</span>
+                                    </div>
+                                    <button
+                                        onClick={() => fetchInitialData()}
+                                        className="ml-4 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors shadow-md active:scale-95"
+                                    >
+                                        Retry
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        {filteredProducts.length === 0 && !loading ? (
                             <div className="py-20 text-stone-400 font-bold font-serif italic text-xl">
                                 {searchQuery ? "No matching product found." : "The fields are resting. Check back soon for the next product."}
                             </div>
                         ) : (
-                            <div
-                                ref={scrollRef}
-                                className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-12 no-scrollbar scroll-smooth px-4 -mx-4 group"
-                            >
-                                {filteredProducts.map((product) => (
-                                    <div key={product.id} className="min-w-[280px] sm:min-w-[340px] flex-shrink-0 snap-start">
-                                        <ProductCard product={product} />
-                                    </div>
-                                ))}
-
-                                {/* View More Card at the end of scroll */}
-                                <motion.div
-                                    className="min-w-[200px] flex-shrink-0 snap-start flex items-center justify-center h-full"
-                                    initial={{ opacity: 0 }}
-                                    whileInView={{ opacity: 1 }}
-                                >
-                                    <Link
-                                        to="/products"
-                                        className="w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:bg-[#2E7D32] hover:text-white transition-all group/btn"
+                            <div className="relative w-full py-12 group">
+                                {/* Navigation Buttons - Desktop */}
+                                <div className="absolute top-1/2 -translate-y-1/2 left-4 md:left-12 z-40 hidden md:block">
+                                    <button
+                                        onClick={prevSlide}
+                                        className="w-14 h-14 rounded-full bg-white border border-stone-200 flex items-center justify-center text-[#0F2E1C] hover:bg-[#2E7D32] hover:text-white hover:border-[#2E7D32] transition-all active:scale-95 group/btn"
                                     >
-                                        <ArrowRight className="w-6 h-6 group-hover/btn:translate-x-1 transition-transform" />
-                                    </Link>
-                                </motion.div>
+                                        <ChevronLeft className="w-6 h-6 group-hover/btn:-translate-x-0.5 transition-transform" />
+                                    </button>
+                                </div>
+                                <div className="absolute top-1/2 -translate-y-1/2 right-4 md:right-12 z-40 hidden md:block">
+                                    <button
+                                        onClick={nextSlide}
+                                        className="w-14 h-14 rounded-full bg-white border border-stone-200 flex items-center justify-center text-[#0F2E1C] hover:bg-[#2E7D32] hover:text-white hover:border-[#2E7D32] transition-all active:scale-95 group/btn"
+                                    >
+                                        <ChevronRight className="w-6 h-6 group-hover/btn:translate-x-0.5 transition-transform" />
+                                    </button>
+                                </div>
+
+                                {/* Infinite Slider Track */}
+                                <div
+                                    className="overflow-hidden"
+                                    onTouchStart={handleTouchStart}
+                                    onTouchEnd={handleTouchEnd}
+                                >
+                                    <motion.div
+                                        className="flex"
+                                        animate={{ x: `-${extIndex * CARD_W}px` }}
+                                        transition={isTransitioning
+                                            ? { duration: 0 }
+                                            : { type: 'spring', stiffness: 120, damping: 22, mass: 0.8 }
+                                        }
+                                        style={{ width: 'max-content', paddingLeft: 'calc(50% - 170px)' }}
+                                        onMouseEnter={() => setIsAutoPlaying(false)}
+                                        onMouseLeave={() => setIsAutoPlaying(true)}
+                                        onAnimationComplete={handleAnimationComplete}
+                                    >
+                                        {clonedProducts.map((product, index) => (
+                                            <div
+                                                key={`clone-${index}`}
+                                                className="flex-shrink-0 mx-3 select-none"
+                                                style={{
+                                                    width: `${CARD_W - 24}px`,
+                                                }}
+                                            >
+                                                <ProductCard product={product} />
+                                            </div>
+                                        ))}
+                                    </motion.div>
+                                </div>
+
+                                {/* Pagination Dots */}
+                                <div className="flex justify-center items-center gap-3 mt-10">
+                                    {filteredProducts.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => {
+                                                setProductIndex(i);
+                                                setExtIndex(filteredProducts.length + i);
+                                                setIsAutoPlaying(false);
+                                            }}
+                                            className={`relative h-2.5 transition-all duration-500 rounded-full ${productIndex === i
+                                                ? 'w-10 bg-[#2E7D32]'
+                                                : 'w-2.5 bg-stone-300 hover:bg-[#2E7D32]/40'
+                                                }`}
+                                        >
+                                            {productIndex === i && (
+                                                <motion.span
+                                                    layoutId="activeDot"
+                                                    className="absolute inset-0 bg-[#2E7D32] rounded-full"
+                                                />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Mobile arrows */}
+                                <div className="md:hidden flex items-center justify-center gap-6 mt-6">
+                                    <button onClick={prevSlide} className="p-3 rounded-full border border-stone-200 text-stone-600 hover:bg-[#2E7D32] hover:text-white hover:border-[#2E7D32] transition-all active:scale-95">
+                                        <ChevronLeft className="w-5 h-5" />
+                                    </button>
+                                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Explore Harvest</span>
+                                    <button onClick={nextSlide} className="p-3 rounded-full border border-stone-200 text-stone-600 hover:bg-[#2E7D32] hover:text-white hover:border-[#2E7D32] transition-all active:scale-95">
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
                         )}
+
+
+
+
+
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -781,8 +950,7 @@ export function HomePage() {
                 </div>
             </section>
 
-            {/* Why Choose Us Section - Warm Beige */}
-            <section className="w-full py-16 md:py-24 bg-[#F5F1E8]">
+            <section className="w-full py-12 md:py-16 bg-[#F5F1E8]">
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}
@@ -928,10 +1096,10 @@ export function HomePage() {
             </section >
 
             {/* Seed to Soul Section - White */}
-            < section className="w-full py-16 md:py-24 bg-white" >
+            < section className="w-full py-12 md:py-16 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-                    <div className="bg-white/60 backdrop-blur-sm rounded-[3rem] md:rounded-[4rem] border border-stone-200/40 p-8 md:p-16 lg:p-20">
-                        <div className="max-w-6xl mx-auto space-y-12 md:space-y-16">
+                    <div className="bg-white/60 backdrop-blur-sm rounded-[3rem] md:rounded-[4rem] border border-stone-200/40 p-8 md:p-12 lg:p-16">
+                        <div className="max-w-6xl mx-auto space-y-10 md:space-y-12">
                             <div className="text-center space-y-4">
                                 <span className="text-emerald-700 text-[10px] font-black uppercase tracking-[0.4em]">OUR ETHIOPIAN PHILOSOPHY</span>
                                 <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl text-[#0F2E1C]">
@@ -1002,8 +1170,7 @@ export function HomePage() {
             </section >
 
 
-            {/* How It Works Section - Modern Timeline */}
-            < section className="w-full py-16 md:py-28 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
+            < section className="w-full py-12 md:py-20 bg-gradient-to-br from-[#E8F0E6]/30 via-white to-[#F5F1E8]/40 relative overflow-hidden" >
                 {/* Decorative Elements */}
                 < div className="absolute top-0 right-0 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl" />
@@ -1136,8 +1303,7 @@ export function HomePage() {
                 </div>
             </section >
 
-            {/* Trusted By / Clients Section */}
-            < section className="w-full py-20 md:py-28 bg-white relative overflow-hidden" >
+            < section className="w-full py-12 md:py-16 bg-white relative overflow-hidden" >
                 {/* Decorative Background */}
                 < div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(46,125,50,0.03),transparent_50%)]" />
 
@@ -1200,8 +1366,7 @@ export function HomePage() {
                 </div>
             </section >
 
-            {/* Trusted By Section - Infinite Loop */}
-            <section className="w-full py-20 md:py-32 bg-[#FCFAFA] overflow-hidden relative">
+            <section className="w-full py-16 md:py-20 bg-[#FCFAFA] overflow-hidden relative">
                 {/* Vibrant Africa-Inspired Accent Circles */}
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#F4D03F]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#2E7D32]/5 rounded-full blur-3xl pointer-events-none" />
@@ -1355,7 +1520,7 @@ export function HomePage() {
             </section >
 
             {/* FAQ Section */}
-            < section className="w-full py-16 md:py-24 bg-white" >
+            < section className="w-full py-12 md:py-16 bg-white" >
                 <div className="container mx-auto px-4 md:px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-start">
                         {/* Content */}

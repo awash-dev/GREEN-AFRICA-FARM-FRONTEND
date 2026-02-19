@@ -12,8 +12,8 @@ const BASE_URL =
 // ─── Axios instance with sane defaults ───────────────────────────────────────
 const client = axios.create({
   baseURL: BASE_URL,
-  // timeout sec 10 s
-  timeout: 10000,
+  // timeout sec 30 s
+  timeout: 30000,
   headers: { "Content-Type": "application/json" },
 });
 

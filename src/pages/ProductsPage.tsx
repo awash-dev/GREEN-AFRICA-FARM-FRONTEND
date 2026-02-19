@@ -53,8 +53,15 @@ export function ProductsPage() {
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState<string[]>(['All', 'Vegetables', 'Fruits', 'Grains', 'Dairy']);
+
+    useEffect(() => {
+        document.title = 'Shop Organic Products | Green Africa Farm – Fresh Vegetables, Fruits & Spices';
+        const meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute('content', 'Browse and buy premium organic vegetables, fruits, spices & coffee from Green Africa Farm. 100% chemical-free Ethiopian produce delivered fresh to your door.');
+    }, []);
     const [language, setLanguage] = useState<'en' | 'am' | 'om'>('en');
     const [hasLoaded, setHasLoaded] = useState(false);  // tracks if we ever had data
+    const [slowConnection, setSlowConnection] = useState(false);
 
     // Use a ref so fast re-renders / HMR don't re-create the abort controller
     const abortRef = useRef<AbortController | null>(null);
@@ -67,12 +74,20 @@ export function ProductsPage() {
 
         if (!silent) setLoading(true);
         setError(null);
+        setSlowConnection(false);
+
+        // Start a timer to detect slow connection
+        const slowTimer = setTimeout(() => {
+            setSlowConnection(true);
+        }, 6000); // 6 seconds before we suggest it's slow
 
         try {
             const [productsRes, categoriesRes] = await Promise.all([
                 api.getAllProducts({ limit: 100 }),
                 api.getCategories(),
             ]);
+
+            clearTimeout(slowTimer);
 
             // Guard: If a new request started while we were awaiting, discard these results
             if (abortRef.current !== controller) return;
@@ -95,15 +110,24 @@ export function ProductsPage() {
                 setCategories(['All', ...cats]);
             }
         } catch (err: any) {
+            clearTimeout(slowTimer);
             if (abortRef.current !== controller) return; // Ignore errors from stale requests
 
             if (err?.name === 'CanceledError' || err?.name === 'AbortError') return;
             console.error('Failed to fetch products:', err);
-            setError('Could not load products. Please check your connection.');
+
+            // Check if it looks like a connection issue
+            const isNetworkError = !err.response || err.code === 'ECONNABORTED' || err.message === 'Network Error';
+            if (isNetworkError) {
+                setError('Your connection is poor. Please check your internet and try again.');
+            } else {
+                setError('Could not load products. Please try again later.');
+            }
         } finally {
             // Only turn off loading if this is still the active request
             if (abortRef.current === controller) {
                 setLoading(false);
+                setSlowConnection(false);
             }
         }
     }, []);
@@ -213,6 +237,26 @@ export function ProductsPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* ── Slow Connection Message ── */}
+                <AnimatePresence>
+                    {loading && slowConnection && !error && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 mb-4"
+                        >
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                                </span>
+                                <span>Your internet is slow, please wait...</span>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* ── Error Banner ── */}
                 <AnimatePresence>

@@ -41,10 +41,10 @@ export function ProductCard({ product }: ProductCardProps) {
                     y: -4,
                     transition: { duration: 0.3 }
                 }}
-                className="h-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group cursor-pointer"
+                className="h-full bg-white rounded-xl overflow-hidden transition-all duration-300 flex flex-col group cursor-pointer border border-stone-100"
             >
                 {/* Image Section */}
-                <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-stone-100">
+                <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-stone-50">
                     <img
                         src={product.image_base64 || "/photo_9_2026-02-18_22-40-51.jpg"}
                         alt={product.name}
@@ -54,7 +54,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     />
 
                     {/* NEW Badge */}
-                    <div className="absolute top-3 left-3">
+                    <div className="absolute top-3 left-3 z-20">
                         <div className="px-2 py-0.5 bg-[#2ecc71] text-white text-[10px] font-bold uppercase tracking-tight rounded-sm">
                             NEW
                         </div>

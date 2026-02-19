@@ -1,0 +1,25 @@
+# Green Africa Farm - Robots.txt
+# https://greenafricafarm.com
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /cart
+Disallow: /order-success
+
+# Sitemaps
+Sitemap: https://greenafricafarm.com/sitemap.xml
+
+# Crawl-delay (be gentle with the server)
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
