@@ -27,7 +27,7 @@ export function HomePage() {
         const fetchInitialData = async () => {
             try {
                 const [productsRes, categoriesRes] = await Promise.all([
-                    api.getAllProducts({ limit: 100 }), // Increased limit for better search coverage
+                    api.getAllProducts({ limit: 12 }),
                     api.getCategories()
                 ]);
 
@@ -901,6 +901,8 @@ export function HomePage() {
                                     <img
                                         src="https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=1000"
                                         alt="Farmer with produce"
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-96 md:h-[500px] object-cover"
                                     />
                                 </motion.div>
